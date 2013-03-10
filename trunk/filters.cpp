@@ -54,7 +54,7 @@ void bandPass( double * T, double start_freq, double stop_freq, double * W, int 
         scale += 2 * T[ n + M ] ;
 
     for ( int i = 0 ; i < aLen ; i++ )
-        T[ i ] = scale ;
+        T[ i ] /= scale ;
 }
 
 void bandStop( double * T, double stop_freq, double start_freq, double * W, int aLen ) {
