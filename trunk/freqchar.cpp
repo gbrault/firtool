@@ -21,7 +21,6 @@ void freqChar( double * T, double * F, int n, int m ) {
 void magnitude( double * F, double * M, int n ) {
     for ( int i = 0 ; i < n ; i += 1 )
         M[ i ] = 10 * log10( F[ 2 * i + 0 ] * F[ 2 * i + 0 ] + F[ 2 * i + 1 ] * F[ 2 * i + 1 ] ) - 20 * log10( 2 ) ;
-//    M[ i ] = /*10 * log10(*/ F[ 2 * i + 0 ] * F[ 2 * i + 0 ] + F[ 2 * i + 1 ] * F[ 2 * i + 1 ] /*) - 20 * log10( 2 )*/ ;
 }
 
 void phase( double * F, double * P, int n ) {

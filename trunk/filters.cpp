@@ -12,11 +12,8 @@ void lowPass( double * T, double stop_freq, double * W, int aLen ) {
         else
             T[ n + M ] = sin( n * fwT0 ) / ( n * M_PI ) * W[ n + M ] ;
 
-    double scale = T[ 0 + M ] ;
-    for( int n = 1 ; n <= M ; n++ )
-        scale += 2 * T[ n + M ] ;
-
-    for( int i = 0; i < aLen ; i++ )
+    double scale = 2 * fabs( T[ 0 + M ] ) ;
+    for( int i = 0 ; i < aLen ; i++ )
         T[ i ] /= scale ;
 }
 
@@ -30,11 +27,8 @@ void highPass( double * T, double start_freq, double * W, int aLen ) {
         else
             T[ n + M ] = -sin( n * fwT0 ) / ( n * M_PI ) * W[ n + M ] ;
 
-    double scale = T[ 0 + M ] ;
-    for ( int n = 1 ; n <= M ; n++ )
-        scale += 2 * T[ n + M ] ;
-
-    for ( int i = 0 ; i < aLen ; i++ )
+    double scale = 2 * fabs( T[ 0 + M ] ) ;
+    for( int i = 0 ; i < aLen ; i++ )
         T[ i ] /= scale ;
 }
 
@@ -47,13 +41,10 @@ void bandPass( double * T, double start_freq, double stop_freq, double * W, int 
         if ( n == 0 )
             T[ n + M ] = ( fwT1 - fwT0 ) / M_PI * W[ n + M ] ;
         else
-            T[ n + M ] = (sin(n * fwT1) - sin(n * fwT0)) / ( n * M_PI ) * W[ n + M ] ;
+            T[ n + M ] = ( sin(n * fwT1 ) - sin( n * fwT0 ) ) / ( n * M_PI ) * W[ n + M ] ;
 
-    double scale = T[ 0 + M ] ;
-    for ( int n = 1 ; n <= M ; n++ )
-        scale += 2 * T[ n + M ] ;
-
-    for ( int i = 0 ; i < aLen ; i++ )
+    double scale = 2 * fabs( T[ 0 + M ] ) ;
+    for( int i = 0 ; i < aLen ; i++ )
         T[ i ] /= scale ;
 }
 
@@ -66,22 +57,20 @@ void bandStop( double * T, double stop_freq, double start_freq, double * W, int 
         if ( n == 0 )
             T[n + M] = 1.0 - ( ( fwT1 - fwT0 ) / M_PI * W[n + M] ) ;
         else
-            T[n + M] =  (sin(n * fwT0) - sin(n * fwT1)) / (n * M_PI) * W[n + M] ;
+            T[n + M] =  ( sin( n * fwT0 ) - sin(n * fwT1 ) ) / (n * M_PI) * W[n + M] ;
 
-    double scale = T[ 0 + M ] ;
-    for ( int n = 1 ; n <= M ; n++ )
-        scale += 2 * T[ n + M ] ;
-
-    for ( int i = 0 ; i < aLen ; i++ )
+    double scale = 2 * fabs( T[ 0 + M ] ) ;
+    for( int i = 0 ; i < aLen ; i++ )
         T[ i ] /= scale ;
 }
 
 void gaussian( double * T, double spb, double bt, int aLen ) {
-    double scale = 0 ;
     double dt = 1.0 / spb ;
     double s = 1.0 / ( sqrt( log( 2.0 ) ) / ( 2 * M_PI * bt ) ) ;
     double t0 = -0.5 * aLen ;
     double ts ;
+    double scale = 0 ;
+
     for ( int i = 0 ; i < aLen ; i++ ) {
         t0++ ;
         ts = s * dt * t0 ;
