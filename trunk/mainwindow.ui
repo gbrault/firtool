@@ -747,7 +747,7 @@
      <x>0</x>
      <y>0</y>
      <width>835</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -785,43 +785,70 @@
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
    <addaction name="actionSave_As"/>
-   <addaction name="actionExit"/>
    <addaction name="separator"/>
    <addaction name="actionDesign"/>
    <addaction name="actionSave_Coefs"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNew">
+   <property name="icon">
+    <iconset resource="firtool.qrc">
+     <normaloff>:/new/icons/document_new.png</normaloff>:/new/icons/document_new.png</iconset>
+   </property>
    <property name="text">
     <string>New</string>
    </property>
   </action>
   <action name="actionExit">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../Google Drive/Icons/16x16/plain/exit.png</normaloff>../../Google Drive/Icons/16x16/plain/exit.png</iconset>
+   </property>
    <property name="text">
     <string>Exit</string>
    </property>
   </action>
   <action name="actionDesign">
+   <property name="icon">
+    <iconset resource="firtool.qrc">
+     <normaloff>:/new/icons/gear.png</normaloff>:/new/icons/gear.png</iconset>
+   </property>
    <property name="text">
     <string>Design</string>
    </property>
   </action>
   <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="firtool.qrc">
+     <normaloff>:/new/icons/document_into.png</normaloff>:/new/icons/document_into.png</iconset>
+   </property>
    <property name="text">
     <string>Open</string>
    </property>
   </action>
   <action name="actionSave">
+   <property name="icon">
+    <iconset resource="firtool.qrc">
+     <normaloff>:/new/icons/disk_blue.png</normaloff>:/new/icons/disk_blue.png</iconset>
+   </property>
    <property name="text">
     <string>Save</string>
    </property>
   </action>
   <action name="actionSave_As">
+   <property name="icon">
+    <iconset resource="firtool.qrc">
+     <normaloff>:/new/icons/disk_blue_window.png</normaloff>:/new/icons/disk_blue_window.png</iconset>
+   </property>
    <property name="text">
     <string>Save As</string>
    </property>
   </action>
   <action name="actionSave_Coefs">
+   <property name="icon">
+    <iconset resource="firtool.qrc">
+     <normaloff>:/new/icons/cpu_preferences.png</normaloff>:/new/icons/cpu_preferences.png</iconset>
+   </property>
    <property name="text">
     <string>Save Coefs</string>
    </property>
@@ -838,6 +865,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="firtool.qrc"/>
+ </resources>
  <connections/>
 </ui>

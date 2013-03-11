@@ -42,3 +42,6 @@ macx : {
     DEPENDPATH += $$PWD/../../../../opt/local/include
     PRE_TARGETDEPS += $$PWD/../../../../opt/local/lib/libfftw3.a
 }
+
+RESOURCES += \
+    firtool.qrc
