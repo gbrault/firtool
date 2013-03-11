@@ -29,6 +29,8 @@ private slots:
     void on_actionSave_Coefs_triggered();
     void on_actionAbout_triggered();
 
+    void on_twType_currentChanged(int index);
+
 private:
     Ui::MainWindow *ui;
     QCustomPlot * customPlotFreq ;

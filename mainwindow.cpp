@@ -91,6 +91,8 @@ MainWindow::MainWindow( QWidget *parent ) :
     // exit
     connect( ui->actionExit, SIGNAL( triggered() ), this, SLOT( close() ) ) ;
 
+    ui->cbFilterType->setCurrentIndex( 0 ) ;
+
     // settings
 //    readSettings() ;
 }
@@ -216,9 +218,9 @@ void MainWindow::on_actionSave_Coefs_triggered() {
 
 void MainWindow::on_actionAbout_triggered() {
     QMessageBox::about( this, "FIRTool", windowTitle() +
-        "\n\nThis program comes with ABSOLUTELY NO WARRANTY." +
-        "\nThis is free software, and you are welcome to redistribute it" +
-        "\nunder certain conditions. See <http://www.gnu.org/licenses/>"
+        "\n\nThis program comes with ABSOLUTELY NO WARRANTY. " +
+        "This is free software, and you are welcome to redistribute it " +
+        "under certain conditions. See <http://www.gnu.org/licenses/>"
     ) ;
 }
 
@@ -226,3 +228,7 @@ void MainWindow::closeEvent( QCloseEvent *event ) {
 //    writeSettings() ;
     event->accept() ;
  }
+
+void MainWindow::on_twType_currentChanged(int index) {
+    ui->cbFilterType->setEnabled( index < 4 ) ;
+}
