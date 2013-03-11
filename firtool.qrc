@@ -6,5 +6,6 @@
         <file>gear.png</file>
         <file>document_into.png</file>
         <file>cpu_preferences.png</file>
+        <file>toolbox.ico</file>
     </qresource>
 </RCC>

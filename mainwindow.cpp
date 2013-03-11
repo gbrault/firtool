@@ -8,6 +8,13 @@ MainWindow::MainWindow( QWidget *parent ) :
 {
     ui->setupUi( this ) ;
 
+    QIcon icon ;
+    icon.addFile( ":/files/toolbox.ico" ) ;
+    this->setWindowTitle( "FIRTool V0.0 ( Qt " + QString(QT_VERSION_STR) + ") - http://www.mediatronix.com" ) ;
+    this->setWindowIcon( icon ) ;
+    qApp->setApplicationName("FIRTool V0.0 ( Qt " + QString(QT_VERSION_STR) + ")") ;
+    qApp->setWindowIcon( icon ) ;
+
     // standard
     connect( ui->actionAbout_Qt, SIGNAL( triggered() ), qApp, SLOT( aboutQt() ) ) ;
 
@@ -21,14 +28,6 @@ MainWindow::MainWindow( QWidget *parent ) :
     customPlotFreq->graph(1)->setPen(QPen(Qt::red));
     customPlotFreq->addGraph( customPlotFreq->xAxis, customPlotFreq->yAxis2 ) ;
     customPlotFreq->graph(2)->setPen(QPen(Qt::green));
-
-//    customPlotFreq->yAxis->setScaleType( QCPAxis::stLogarithmic ) ;
-//    customPlotFreq->yAxis->setTickLabelType( QCPAxis::ltBell ) ;
-//    customPlotFreq->yAxis->setNumberPrecision( 0 ) ;
-//    customPlotFreq->yAxis->setNumberFormat( "fbc" ) ;
-//    customPlotFreq->yAxis->setAutoTickStep( true ) ;
-//    customPlotFreq->yAxis->setAutoTicks( true ) ;
-
 
     // configure right and top axis to show ticks but no labels:
 //    customPlotFreq->setupFullAxesBox() ;
