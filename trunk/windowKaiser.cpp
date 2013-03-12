@@ -9,7 +9,7 @@ static double I0( double x ) {
         d += 2.0 ;
         ds *= x * x / ( d * d ) ;
         s += ds ;
-    } while ( ds > s * 1E-21 ) ;
+    } while ( ds > s * 1E-48 ) ;
     return s ;
 }
 

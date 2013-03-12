@@ -18,9 +18,16 @@ void freqChar( double * T, double * F, int n, int m ) {
     fftf( R, (fftw_complex *)F, m ) ;
 }
 
-void magnitude( double * F, double * M, int n ) {
+void magnitude( double * F, double * M, int n) {
+    double max = 0.0 ;
+
+    for ( int i = 0 ; i < n ; i += 1 ) {
+        M[ i ] = F[ 2 * i + 0 ] * F[ 2 * i + 0 ] + F[ 2 * i + 1 ] * F[ 2 * i + 1 ] ;
+        if ( max < fabs( M[ i ] ) )
+            max = fabs( M[ i ] ) ;
+    }
     for ( int i = 0 ; i < n ; i += 1 )
-        M[ i ] = 10 * log10( F[ 2 * i + 0 ] * F[ 2 * i + 0 ] + F[ 2 * i + 1 ] * F[ 2 * i + 1 ] ) - 20 * log10( 2 ) ;
+        M[ i ] = 10 * log10( M[ i ] / max ) ;
 }
 
 void phase( double * F, double * P, int n ) {

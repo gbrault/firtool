@@ -153,7 +153,7 @@ void MainWindow::on_actionDesign_triggered() {
     customPlotTime->replot();
 
 
-    const int FFTLEN = 4096 ;
+    int FFTLEN = nTaps < 2048 ? 2048 : nTaps ;
 
     QVector<double> x2( FFTLEN ) ;
     for ( int i = 0 ; i < FFTLEN / 2 ; i += 1 )
@@ -178,13 +178,13 @@ void MainWindow::on_actionDesign_triggered() {
 //    customPlotFreq->graph(1)->rescaleValueAxis();
     customPlotFreq->replot();
 
-    double range = pow( 2, ui->dsbNBits->value() ) ;
+    double range = pow( 2, ui->dsbNBits->value() ) - 1 ;
     ui->twCoefs->clear();
     for ( int i = 0 ; i < nTaps ; i += 1 ) {
         QStringList columns ;
         columns << QString("%1").arg( i ) ;
         columns << QString("%1").arg( trunc( T[ i ] * 1E9 ) / 1E9, 0, 'g', 9 ) ;
-        columns << QString("%1").arg( trunc( T[ i ] * range + 0.5 ), 0, 'g', 9 ) ;
+        columns << QString("%1").arg( trunc( T[ i ] * range ), 0, 'g', 9 ) ;
         columns << QString("%1").arg( trunc( W[ i ] * 1E9 ) / 1E9, 0, 'g', 9 ) ;
         ui->twCoefs->addTopLevelItem( new QTreeWidgetItem( columns ) ) ;
     }
@@ -208,10 +208,10 @@ void MainWindow::on_actionSave_Coefs_triggered() {
     QTextStream stream( &file ) ;
     stream << ";\n; Created by FIRTool at: " << QDateTime::currentDateTime().toString() << "\n" << "; c 2013 www.mediatronix.com\n;\n" ;
     stream << "radix = 10 ;\n" << "coefdata =\n" ;
-    double range = pow( 2, ui->dsbNBits->value() ) ;
+    double range = pow( 2, ui->dsbNBits->value() ) - 1 ;
     for ( int i = 0 ; i < Coefs.size() - 1 ; i += 1 )
-        stream << QString("%1").arg( trunc( Coefs[ i ] * range + 0.5 ), 0, 'g', 9 ) << ",\n" ;
-    stream << QString("%1").arg( trunc( Coefs[ Coefs.size() - 1 ] * range + 0.5 ), 0, 'g', 9 ) << ";\n" ;
+        stream << QString("%1").arg( trunc( Coefs[ i ] * range ), 0, 'g', 9 ) << ",\n" ;
+    stream << QString("%1").arg( trunc( Coefs[ Coefs.size() - 1 ] * range ), 0, 'g', 9 ) << ";\n" ;
     file.close() ;
 }
 
