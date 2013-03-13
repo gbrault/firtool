@@ -71,7 +71,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     customPlotTime->setRangeZoom(Qt::Horizontal | Qt::Vertical);
     customPlotTime->setInteraction(QCustomPlot::iSelectPlottables); // allow selection of graphs via mouse click
 
-    ui->cbFilterType->addItems( QStringList() << "Chebyshev" << "Kaiser" << "harris" );
+    ui->cbFilterType->addItems( QStringList() << "Chebyshev" << "Kaiser" << "harris" << "Nuttall" << "Flat top" << "Rife-Vincent" );
 
     ui->twCoefs->setHeaderLabels( QStringList() << "Index" << "Coefs" << "Actual" << "Window" ) ;
     ui->twCoefs->setColumnWidth( 0, 60 ) ;
@@ -120,6 +120,15 @@ void MainWindow::on_actionDesign_triggered() {
         break ;
     case 2 :
         harris( W.data(), nTaps, ui->dsbAtten->value() ) ;
+        break ;
+    case 3 :
+        nuttall( W.data(), nTaps, ui->dsbAtten->value() ) ;
+        break ;
+    case 4 :
+        flattop( W.data(), nTaps, ui->dsbAtten->value() ) ;
+        break ;
+    case 5 :
+        rifeVincent( W.data(), nTaps, ui->dsbAtten->value() ) ;
         break ;
     }
 
@@ -197,7 +206,7 @@ void MainWindow::on_actionSave_Coefs_triggered() {
         return ;
 
     QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Save Xilinx Coefficient File"), ".", tr( "Xilinx coefficient files (*.coe);;All files (*.*)" ) ) ;
+        this, tr("Save Coefficient File"), ".", tr( "Xilinx coefficient files (*.coe);;C/C++ include files (*.h);;All files (*.*)" ) ) ;
     if ( fileName.isEmpty() )
         return ;
 
@@ -206,12 +215,21 @@ void MainWindow::on_actionSave_Coefs_triggered() {
         return ;
 
     QTextStream stream( &file ) ;
-    stream << ";\n; Created by FIRTool at: " << QDateTime::currentDateTime().toString() << "\n" << "; c 2013 www.mediatronix.com\n;\n" ;
-    stream << "radix = 10 ;\n" << "coefdata =\n" ;
-    double range = pow( 2, ui->dsbNBits->value() ) - 1 ;
-    for ( int i = 0 ; i < Coefs.size() - 1 ; i += 1 )
-        stream << QString("%1").arg( trunc( Coefs[ i ] * range ), 0, 'g', 9 ) << ",\n" ;
-    stream << QString("%1").arg( trunc( Coefs[ Coefs.size() - 1 ] * range ), 0, 'g', 9 ) << ";\n" ;
+    if ( fileName.endsWith( ".coe", Qt::CaseInsensitive ) ) {
+        stream << ";\n; Created by FIRTool at: " << QDateTime::currentDateTime().toString() << "\n" << "; c 2013 www.mediatronix.com\n;\n" ;
+        stream << "radix = 10 ;\n" << "coefdata =\n" ;
+        double range = pow( 2, ui->dsbNBits->value() ) - 1 ;
+        for ( int i = 0 ; i < Coefs.size() - 1 ; i += 1 )
+            stream << QString("%1").arg( trunc( Coefs[ i ] * range ), 0, 'g', 9 ) << ",\n" ;
+        stream << QString("%1").arg( trunc( Coefs[ Coefs.size() - 1 ] * range ), 0, 'g', 9 ) << ";\n" ;
+    } else
+    if ( fileName.endsWith( ".h", Qt::CaseInsensitive ) ) {
+        stream << "//\n// Created by FIRTool at: " << QDateTime::currentDateTime().toString() << "//\n" << "// c 2013 www.mediatronix.com\n//\n" ;
+        stream << "double coefdata[] = (\n" ;
+        for ( int i = 0 ; i < Coefs.size() - 1 ; i += 1 )
+            stream << QString("    %1").arg( Coefs[ i ], 0, 'g', 9 ) << ",\n" ;
+        stream << QString("    %1").arg( Coefs[ Coefs.size() - 1 ], 0, 'g', 9 ) << "\n) ;\n" ;
+    }
     file.close() ;
 }
 
