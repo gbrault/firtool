@@ -4,6 +4,9 @@
 void chebyshev( double * W, int aLen, double aAtten ) ;
 void kaiser( double * W, int aLen, double aAtten ) ;
 void harris( double * W, int aLen, double aAtten ) ;
+void nuttall( double * W, int aLen, double aAtten ) ;
+void flattop( double * W, int aLen, double aAtten ) ;
+void rifeVincent( double * W, int aLen, double aAtten ) ;
 
 void lowPass( double * T, double stop_freq, double * W, int aLen ) ;
 void highPass( double * T, double start_freq, double * W, int aLen ) ;
