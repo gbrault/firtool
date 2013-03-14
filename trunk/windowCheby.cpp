@@ -30,7 +30,7 @@ void chebyshev( double * W, int aLen, double aAtten ) {
 
         z[ 0 ][ 0 ] = z[ 0 ][ 0 ] / 2 ;
         z[ M ][0] = z[ 0 ][0] ;
-        for ( int k = 0 ; k < aLen ; k += 1 )
-            W[ k ] = z[ k ][0] / z[ M / 2 ][0] ;
+        for ( int i = 0 ; i < aLen ; i += 1 )
+            W[ i ] = z[ i ][ 0 ] / z[ M / 2 ][ 0 ] ;
     }
 }
