@@ -21,7 +21,8 @@ SOURCES += \
     filters.cpp \
     fftw.cpp \
     windowKaiser.cpp \
-    windowHarris.cpp
+    windowHarris.cpp \
+    windowRifeVincent.cpp
 
 HEADERS  += \
     mainwindow.h \
