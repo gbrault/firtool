@@ -6,7 +6,7 @@ void kaiser( double * W, int aLen, double aAtten ) ;
 void harris( double * W, int aLen ) ;
 void nuttall( double * W, int aLen ) ;
 void flattop( double * W, int aLen ) ;
-void rifeVincent( double * W, int aLen ) ;
+void rifeVincentI4( double * W, int aLen ) ;
 
 void lowPass( double * T, double stop_freq, double * W, int aLen ) ;
 void highPass( double * T, double start_freq, double * W, int aLen ) ;
