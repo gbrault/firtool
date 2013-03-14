@@ -31,6 +31,8 @@ private slots:
 
     void on_twType_currentChanged(int index);
 
+    void on_cbFilterType_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
     QCustomPlot * customPlotFreq ;
