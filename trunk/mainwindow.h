@@ -9,8 +9,10 @@
 #include "QMessageBox"
 
 #include "qcustomplot.h"
+
 #include "filters.h"
 #include "freqchar.h"
+
 #include <windowCheby.h>
 #include <windowKaiser.h>
 #include <windowHarris.h>
@@ -43,7 +45,7 @@ private:
     QCustomPlot * customPlotFreq ;
     QCustomPlot * customPlotTime ;
 
-    QVector<double> Coefs ;
-};
+    QVector<long double> Coefs ;
+} ;
 
 #endif // MAINWINDOW_H

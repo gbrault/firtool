@@ -3,7 +3,7 @@
 
 #include "fftw3.h"
 
-void fftf( fftw_complex x[], fftw_complex y[], int n ) ;
-void fftb( fftw_complex x[], fftw_complex y[], int n ) ;
+void fftf( fftwl_complex x[], fftwl_complex y[], int n ) ;
+void fftb( fftwl_complex x[], fftwl_complex y[], int n ) ;
 
 #endif // FFTW_H

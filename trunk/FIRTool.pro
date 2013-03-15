@@ -39,14 +39,14 @@ HEADERS  += \
 FORMS    += mainwindow.ui
 
 win32: {
-    LIBS += -L$$PWD -lfftw3-3
+    LIBS += -L$$PWD -lfftw3l-3
 }
 
 macx : {
-    LIBS += -L$$PWD/../../../../opt/local/lib/ -lfftw3
+    LIBS += -L$$PWD/../../../../opt/local/lib/ -lfftw3l
     INCLUDEPATH += $$PWD/../../../../opt/local/include
     DEPENDPATH += $$PWD/../../../../opt/local/include
-    PRE_TARGETDEPS += $$PWD/../../../../opt/local/lib/libfftw3.a
+    PRE_TARGETDEPS += $$PWD/../../../../opt/local/lib/libfftw3l.a
 }
 
 RESOURCES += \
