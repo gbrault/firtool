@@ -29,7 +29,12 @@ HEADERS  += \
     qcustomplot.h \
     fftw3.h \
     filters.h \
-    fftw.h
+    fftw.h \
+    windowRifeVincent.h \
+    windowHarris.h \
+    freqchar.h \
+    windowCheby.h \
+    windowKaiser.h
 
 FORMS    += mainwindow.ui
 
