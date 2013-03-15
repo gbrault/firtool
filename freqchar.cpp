@@ -3,22 +3,22 @@
 #include "fftw.h"
 
 
-void freqChar( double * T, double * F, int n, int m ) {
-    fftw_complex R[ m ] ;
+void freqChar( long double * T, long double * F, int n, int m ) {
+    fftwl_complex R[ m ] ;
     double max = fabs( T[ n / 2 ] ) ;
 
     for ( int i = 0 ; i < m ; i += 1 )
-        R[ i ][ 0 ] = R[ i ][ 1 ] = 0.0 ;
+        R[ i ][ 0 ] = R[ i ][ 1 ] = 0.0L ;
 
     R[ 0 ][ 0 ] = T[ n / 2 ] / max ;
 
     for ( int i = 1 ; i <= n / 2 ; i += 1 )
         R[ i ][ 0 ] = R[ m - i ][ 0 ] = T[ n / 2 + i ] / max ;
 
-    fftf( R, (fftw_complex *)F, m ) ;
+    fftf( R, (fftwl_complex *)F, m ) ;
 }
 
-void magnitude( double * F, double * M, int n) {
+void magnitude( long double * F, double * M, int n) {
     double max = 0.0 ;
 
     for ( int i = 0 ; i < n ; i += 1 ) {
@@ -30,7 +30,7 @@ void magnitude( double * F, double * M, int n) {
         M[ i ] = 10 * log10( M[ i ] / max ) ;
 }
 
-void phase( double * F, double * P, int n ) {
+void phase( long double * F, double * P, int n ) {
     for ( int i = 0 ; i < n ; i += 1 )
         P[ i ] = atan2( F[ 2 * i + 1 ], F[ 2 * i + 0 ] ) ;
 }

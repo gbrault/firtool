@@ -2,7 +2,7 @@
 #include "math.h"
 #include "filters.h"
 
-void lowPass( double * T, double stop_freq, double * W, int aLen ) {
+void lowPass( long double * T, double stop_freq, long double * W, int aLen ) {
     int M = ( aLen - 1 ) / 2 ;
 
     double fwT0 = 2 * M_PI * stop_freq ;
@@ -17,7 +17,7 @@ void lowPass( double * T, double stop_freq, double * W, int aLen ) {
         T[ i ] /= scale ;
 }
 
-void highPass( double * T, double start_freq, double * W, int aLen ) {
+void highPass( long double * T, double start_freq, long double * W, int aLen ) {
     int M = ( aLen - 1 ) / 2 ;
     double fwT0 = 2 * M_PI * start_freq ;
 
@@ -32,7 +32,7 @@ void highPass( double * T, double start_freq, double * W, int aLen ) {
         T[ i ] /= scale ;
 }
 
-void bandPass( double * T, double start_freq, double stop_freq, double * W, int aLen ) {
+void bandPass( long double * T, double start_freq, double stop_freq, long double * W, int aLen ) {
     int M = ( aLen - 1 ) / 2 ;
     double fwT0 = 2 * M_PI * start_freq ;
     double fwT1 = 2 * M_PI * stop_freq ;
@@ -48,7 +48,7 @@ void bandPass( double * T, double start_freq, double stop_freq, double * W, int 
         T[ i ] /= scale ;
 }
 
-void bandStop( double * T, double stop_freq, double start_freq, double * W, int aLen ) {
+void bandStop( long double * T, double stop_freq, double start_freq, long double * W, int aLen ) {
     int M = ( aLen - 1 ) / 2 ;
     double fwT0 = 2 * M_PI * stop_freq ;
     double fwT1 = 2 * M_PI * start_freq ;
@@ -64,7 +64,7 @@ void bandStop( double * T, double stop_freq, double start_freq, double * W, int 
         T[ i ] /= scale ;
 }
 
-void gaussian( double * T, double spb, double bt, int aLen ) {
+void gaussian( long double * T, double spb, double bt, int aLen ) {
     double dt = 1.0 / spb ;
     double s = 1.0 / ( sqrt( log( 2.0 ) ) / ( 2 * M_PI * bt ) ) ;
     double t0 = -0.5 * aLen ;
@@ -81,7 +81,7 @@ void gaussian( double * T, double spb, double bt, int aLen ) {
         T[ i ] /= scale ;
 }
 
-void rootRaisedCosine( double * T, double spb, double alpha, int aLen ) {
+void rootRaisedCosine( long double * T, double spb, double alpha, int aLen ) {
     double scale = 0 ;
     for ( int i = 0 ; i < aLen ; i++ ) {
         double x1, x2, x3, num, den ;

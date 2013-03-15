@@ -1,15 +1,15 @@
 
 #include "fftw3.h"
 
-void fftf( fftw_complex x[], fftw_complex y[], int n ) {
-    fftw_plan pPlan = fftw_plan_dft_1d( n, x, y, FFTW_FORWARD, FFTW_ESTIMATE ) ;
-    fftw_execute( pPlan ) ;
-    fftw_destroy_plan( pPlan ) ;
+void fftf( fftwl_complex x[], fftwl_complex y[], int n ) {
+    fftwl_plan pPlan = fftwl_plan_dft_1d( n, x, y, FFTW_FORWARD, FFTW_ESTIMATE ) ;
+    fftwl_execute( pPlan ) ;
+    fftwl_destroy_plan( pPlan ) ;
 }
 
-void fftb( fftw_complex x[], fftw_complex y[], int n ) {
-    fftw_plan pPlan = fftw_plan_dft_1d( n, x, y, FFTW_BACKWARD, FFTW_ESTIMATE ) ;
-    fftw_execute( pPlan ) ;
-    fftw_destroy_plan( pPlan ) ;
+void fftb( fftwl_complex x[], fftwl_complex y[], int n ) {
+    fftwl_plan pPlan = fftwl_plan_dft_1d( n, x, y, FFTW_BACKWARD, FFTW_ESTIMATE ) ;
+    fftwl_execute( pPlan ) ;
+    fftwl_destroy_plan( pPlan ) ;
 }
 

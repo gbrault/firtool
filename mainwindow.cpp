@@ -8,12 +8,11 @@ MainWindow::MainWindow( QWidget *parent ) :
 {
     ui->setupUi( this ) ;
 
-    QIcon icon ;
-    icon.addFile( ":/files/toolbox.ico" ) ;
     this->setWindowTitle( "FIRTool V0.1 ( Qt " + QString(QT_VERSION_STR) + ") - http://www.mediatronix.com" ) ;
-    this->setWindowIcon( icon ) ;
-    qApp->setApplicationName("FIRTool V0.1 ( Qt " + QString(QT_VERSION_STR) + "" ) ;
-    qApp->setWindowIcon( icon ) ;
+    this->setWindowIcon( QIcon( ":/files/toolbox.ico" ) ) ;
+
+//    qApp->setApplicationName("FIRTool V0.1 ( Qt " + QString(QT_VERSION_STR) + "" ) ;
+//    qApp->setWindowIcon( QIcon( ":/files/toolbox.ico" ) ) ;
 
     // standard
     connect( ui->actionAbout_Qt, SIGNAL( triggered() ), qApp, SLOT( aboutQt() ) ) ;
@@ -101,7 +100,7 @@ void MainWindow::on_actionDesign_triggered() {
     for ( int i = 0 ; i < nTaps ; i += 1 )
         x[ i ] = (double)i ;
 
-    QVector<double> W( nTaps ) ;
+    QVector<long double> W( nTaps ) ;
 
     // filter window
     switch ( ui->cbFilterType->currentIndex() ) {
@@ -126,7 +125,7 @@ void MainWindow::on_actionDesign_triggered() {
     }
 
     // filter type
-    QVector<double> T( nTaps ) ;
+    QVector<long double> T( nTaps ) ;
     switch ( ui->twType->currentIndex() ) {
     case 0 :
         lowPass( T.data(), ui->dsbLPStop->value(), W.data(), nTaps ) ;
@@ -148,8 +147,15 @@ void MainWindow::on_actionDesign_triggered() {
         break ;
     }
 
-    customPlotTime->graph(0)->setData( x, W ) ;
-    customPlotTime->graph(1)->setData( x, T ) ;
+
+    QVector<double> w( nTaps ) ;
+    for ( int i = 0 ; i < nTaps ; i += 1 )
+        w[ i ] = W[ i ] ;
+    customPlotTime->graph(0)->setData( x, w ) ;
+    QVector<double> t( nTaps ) ;
+    for ( int i = 0 ; i < nTaps ; i += 1 )
+        t[ i ] = T[ i ] ;
+    customPlotTime->graph(1)->setData( x, t ) ;
 
     customPlotTime->rescaleAxes();
     customPlotTime->replot();
@@ -161,7 +167,7 @@ void MainWindow::on_actionDesign_triggered() {
     for ( int i = 0 ; i < FFTLEN / 2 ; i += 1 )
         x2[ i ] = (double)i / FFTLEN ;
 
-    QVector<double> F( 2 * FFTLEN ) ;
+    QVector<long double> F( 2 * FFTLEN ) ;
     freqChar( T.data(), F.data(), nTaps, FFTLEN ) ;
 
     QVector<double> M( FFTLEN ) ;
