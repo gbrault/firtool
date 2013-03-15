@@ -121,7 +121,7 @@ void MainWindow::on_actionDesign_triggered() {
         flattop( W.data(), nTaps ) ;
         break ;
     case 5 :
-        rifeVincentI4( W.data(), nTaps ) ;
+        rifeVincent( RV_III4, W.data(), nTaps ) ;
         break ;
     }
 

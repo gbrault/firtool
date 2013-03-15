@@ -10,6 +10,11 @@
 
 #include "qcustomplot.h"
 #include "filters.h"
+#include "freqchar.h"
+#include <windowCheby.h>
+#include <windowKaiser.h>
+#include <windowHarris.h>
+#include <windowRifeVincent.h>
 
 namespace Ui {
 class MainWindow;
