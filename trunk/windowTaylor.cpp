@@ -3,34 +3,36 @@
 #include <QDebug>
 
 void taylor( long double * W, int aLen, double aAtten ) {
-    int nprime = 8 ;
+    int M = 4 ;
 
-    double x = pow( 10.0, aAtten / 20.0 ) ;
-    double A = log( x + sqrt ( x * x - 1.0 ) ) / M_PI ;
+    double R = pow( 10.0, aAtten / 20.0 ) ;
+    qDebug() << R ;
+    double L = log( R + sqrt( R * R - 1.0 ) ) / M_PI ;
 
-    double np_5 = nprime - 0.5 ;
-    double sigma = (double)nprime / sqrt( A * A + np_5 * np_5 ) ;
+    double M_1 = M + 1.0 ;
+    double M_5 = M + 0.5 ;
+    double sigma2 = M_1 * M_1 / ( L * L + sqrt( L * L + M_5 * M_5 ) ) ;
 
-    double Fm[ nprime ] ;
-    Fm[ 0 ] = 0.0 ;
-    for ( int m = 1 ; m < nprime ; m += 1 ) {
+    double D[ M ] ;
+    D[ 0 ] = 0.0 ;
+    for ( int n = 1 ; n < M ; n += 1 ) {
         double dp = 1.0 ;
         double np = 1.0 ;
-        for ( int n = 1 ; n < nprime ; n += 1 ) {
-            if ( n != m )
-                dp *= 1.0 - m * m / n * n ;
+        for ( int K = 1 ; K < M ; K += 1 ) {
+            if ( K != n )
+                dp *= 1.0 - n * n / K * K ;
 
-            double n_5 = n - 0.5 ;
-            np *= 1.0 - m * m / ( A * A + n_5 * n_5 ) / sigma / sigma ;
+            double K_5 = K - 0.5 ;
+            np *= 1.0 - n * n / sigma2 / ( L + K_5 * K_5 )  ;
         }
-        Fm[ m ] = ( m % 2 ? 1.0 : -1.0 ) * np / dp ;
-        qDebug() << m << Fm[ m ] ;
+        D[ n ] = - np / dp ;
+        qDebug() << n << D[ n ] ;
     }
 
     for ( int i = 0 ; i < aLen ; i += 1, W++ ) {
         *W = 1.0 ;
-        for ( int m = 1 ; m < nprime ; m += 1 )
-            *W += 2 * Fm[ m ] * -cos( 2.0 * m * M_PI * i / aLen ) ;
+        for ( int m = 1 ; m < M ; m += 1 )
+            *W += 2 * D[ m ] * -cos( 2.0 * m * M_PI * i / aLen ) ;
     }
 }
 

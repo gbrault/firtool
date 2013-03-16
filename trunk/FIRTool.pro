@@ -22,8 +22,7 @@ SOURCES += \
     fftw.cpp \
     windowKaiser.cpp \
     windowHarris.cpp \
-    windowRifeVincent.cpp \
-    windowTaylor.cpp
+    windowRifeVincent.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -35,8 +34,7 @@ HEADERS  += \
     windowHarris.h \
     freqchar.h \
     windowCheby.h \
-    windowKaiser.h \
-    windowTaylor.h
+    windowKaiser.h
 
 FORMS    += mainwindow.ui
 

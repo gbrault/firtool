@@ -3,6 +3,7 @@
 
 typedef enum _RV {
     RV_I1 = 0, RV_I2, RV_I3, RV_I4,
+    RV_II,
     RV_III1, RV_III2, RV_III3, RV_III4
 } RV_t ;
 

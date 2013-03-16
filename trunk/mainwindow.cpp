@@ -110,7 +110,7 @@ void MainWindow::on_actionDesign_triggered() {
         kaiser( W.data(), nTaps, ui->dsbAtten->value() ) ;
         break ;
     case 2 :
-        taylor( W.data(), nTaps, ui->dsbAtten->value() ) ;
+        rifeVincent( RV_II, W.data(), nTaps ) ;
         break ;
     case 3 :
         rifeVincent( RV_III4, W.data(), nTaps ) ;
