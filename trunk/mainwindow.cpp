@@ -11,9 +11,6 @@ MainWindow::MainWindow( QWidget *parent ) :
     this->setWindowTitle( "FIRTool V0.1 ( Qt " + QString(QT_VERSION_STR) + ") - http://www.mediatronix.com" ) ;
     this->setWindowIcon( QIcon( ":/files/toolbox.ico" ) ) ;
 
-//    qApp->setApplicationName("FIRTool V0.1 ( Qt " + QString(QT_VERSION_STR) + "" ) ;
-//    qApp->setWindowIcon( QIcon( ":/files/toolbox.ico" ) ) ;
-
     // standard
     connect( ui->actionAbout_Qt, SIGNAL( triggered() ), qApp, SLOT( aboutQt() ) ) ;
 
@@ -22,11 +19,11 @@ MainWindow::MainWindow( QWidget *parent ) :
     ui->loMagnitude->addWidget( customPlotFreq ) ;
 
     customPlotFreq->addGraph( ) ;
-    customPlotFreq->graph(0)->setPen( QPen( Qt::blue ) ) ;
+    customPlotFreq->graph( 0 )->setPen( QPen( Qt::blue ) ) ;
     customPlotFreq->addGraph( customPlotFreq->xAxis, customPlotFreq->yAxis2 ) ;
-    customPlotFreq->graph(1)->setPen( QPen( Qt::red ) ) ;
+    customPlotFreq->graph( 1 )->setPen( QPen( Qt::red ) ) ;
     customPlotFreq->addGraph( customPlotFreq->xAxis, customPlotFreq->yAxis2 ) ;
-    customPlotFreq->graph(2)->setPen( QPen( Qt::green ) ) ;
+    customPlotFreq->graph( 2 )->setPen( QPen( Qt::green ) ) ;
 
     // make range moveable by mouse interaction (click and drag):
     customPlotFreq->setRangeDrag( Qt::Horizontal | Qt::Vertical ) ;
@@ -63,7 +60,9 @@ MainWindow::MainWindow( QWidget *parent ) :
     customPlotTime->setRangeZoom( Qt::Horizontal | Qt::Vertical ) ;
     customPlotTime->setInteraction(QCustomPlot::iSelectPlottables); // allow selection of graphs via mouse click
 
-    ui->cbFilterType->addItems( QStringList() << "Chebyshev" << "Kaiser" << "harris" << "Nuttall" << "Flat top" << "Rife-Vincent" );
+    ui->cbFilterType->addItems(
+        QStringList() << "Chebyshev" << "Kaiser" << "Taylor"
+            << "Rife-Vincent" << "harris" << "Nuttall" << "Flat top" );
 
     ui->twCoefs->setHeaderLabels( QStringList() << "Index" << "Coefs" << "Actual" << "Window" ) ;
     ui->twCoefs->setColumnWidth( 0, 60 ) ;
@@ -111,16 +110,19 @@ void MainWindow::on_actionDesign_triggered() {
         kaiser( W.data(), nTaps, ui->dsbAtten->value() ) ;
         break ;
     case 2 :
-        harris( W.data(), nTaps ) ;
+        taylor( W.data(), nTaps, ui->dsbAtten->value() ) ;
         break ;
     case 3 :
-        nuttall( W.data(), nTaps ) ;
+        rifeVincent( RV_III4, W.data(), nTaps ) ;
         break ;
     case 4 :
-        flattop( W.data(), nTaps ) ;
+        harris( W.data(), nTaps ) ;
         break ;
     case 5 :
-        rifeVincent( RV_III4, W.data(), nTaps ) ;
+        nuttall( W.data(), nTaps ) ;
+        break ;
+    case 6 :
+        flattop( W.data(), nTaps ) ;
         break ;
     }
 
@@ -261,5 +263,5 @@ void MainWindow::on_twType_currentChanged( int index ) {
 }
 
 void MainWindow::on_cbFilterType_currentIndexChanged( int index ) {
-    ui->dsbAtten->setEnabled( index < 2 ) ;
+    ui->dsbAtten->setEnabled( index < 3 ) ;
 }

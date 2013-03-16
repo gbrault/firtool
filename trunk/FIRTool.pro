@@ -22,7 +22,8 @@ SOURCES += \
     fftw.cpp \
     windowKaiser.cpp \
     windowHarris.cpp \
-    windowRifeVincent.cpp
+    windowRifeVincent.cpp \
+    windowTaylor.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -34,12 +35,29 @@ HEADERS  += \
     windowHarris.h \
     freqchar.h \
     windowCheby.h \
-    windowKaiser.h
+    windowKaiser.h \
+    windowTaylor.h
 
 FORMS    += mainwindow.ui
 
+RESOURCES += \
+    firtool.qrc
+
 win32: {
+    OTHER_FILES += firtool.rc
+    RC_FILE = firtool.rc
+}
+macx: {
+    ICON = firtool.ico
+}
+
+
+win32 : {
     LIBS += -L$$PWD -lfftw3l-3
+}
+
+win32: {
+    QMAKE_LFLAGS += -static-libgcc -static-libstdc++
 }
 
 macx : {
@@ -49,5 +67,3 @@ macx : {
     PRE_TARGETDEPS += $$PWD/../../../../opt/local/lib/libfftw3l.a
 }
 
-RESOURCES += \
-    firtool.qrc

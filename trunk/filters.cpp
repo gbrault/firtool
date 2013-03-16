@@ -92,9 +92,9 @@ void rootRaisedCosine( long double * T, double spb, double alpha, int aLen ) {
 
         if ( fabs( x3 ) >= 0.000001 ) {  // Avoid Rounding errors...
             if ( i != aLen / 2 )
-                num = cos( ( 1 + alpha ) * x1 ) + sin( ( 1 - alpha ) * x1 ) / ( 4 * alpha * xindx / spb ) ;
+                num = cos( ( 1.0 + alpha ) * x1 ) + sin( ( 1.0 - alpha ) * x1 ) / ( 4 * alpha * xindx / spb ) ;
             else
-                num = cos( ( 1 + alpha ) * x1 ) + ( 1 - alpha ) * M_PI / ( 4 * alpha ) ;
+                num = cos( ( 1.0 + alpha ) * x1 ) + ( 1.0 - alpha ) * M_PI / ( 4 * alpha ) ;
             den = x3 * M_PI ;
         } else {
             if ( alpha == 1 ) {
@@ -103,8 +103,8 @@ void rootRaisedCosine( long double * T, double spb, double alpha, int aLen ) {
             }
             x3 = ( 1 - alpha ) * x1 ;
             x2 = ( 1 + alpha ) * x1 ;
-            num = ( sin( x2 ) * ( 1 + alpha ) * M_PI
-                - cos( x3 ) * ( ( 1 - alpha ) * M_PI * spb ) / ( 4 * alpha * xindx )
+            num = ( sin( x2 ) * ( 1.0 + alpha ) * M_PI
+                - cos( x3 ) * ( ( 1.0 - alpha ) * M_PI * spb ) / ( 4 * alpha * xindx )
                 + sin( x3 ) * spb * spb / ( 4 * alpha * xindx * xindx ) ) ;
             den = -32 * M_PI * alpha * alpha * xindx / spb ;
         }
