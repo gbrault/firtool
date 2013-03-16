@@ -1,6 +1,33 @@
 
 #include <math.h>
 #include <windowRifeVincent.h>
+#include <QDebug>
+
+static void taylor( double D[], int M, double aAtten ) {
+    double R = pow( 10.0, aAtten / 20.0 ) ;
+    qDebug() << R ;
+    double L = log( R + sqrt( R * R - 1.0 ) ) / M_PI ;
+
+    double M_1 = M + 1.0 ;
+    double M_5 = M + 0.5 ;
+    double sigma2 = M_1 * M_1 / ( L * L + sqrt( L * L + M_5 * M_5 ) ) ;
+
+    D[ 0 ] = 0.0 ;
+    for ( int n = 1 ; n < M ; n += 1 ) {
+        double dp = 1.0 ;
+        double np = 1.0 ;
+        for ( int K = 1 ; K < M ; K += 1 ) {
+            if ( K != n )
+                dp *= 1.0 - n * n / K * K ;
+
+            double K_5 = K - 0.5 ;
+            np *= 1.0 - n * n / sigma2 / ( L + K_5 * K_5 )  ;
+        }
+        D[ n ] = - np / dp ;
+        qDebug() << n << D[ n ] ;
+    }
+}
+
 
 void rifeVincent( RV_t type, long double * W, int aLen ) {
     switch ( type ) {
@@ -34,6 +61,16 @@ void rifeVincent( RV_t type, long double * W, int aLen ) {
                 - 8.0L / 128 * cosl( 6.0L * M_PI * k / ( aLen - 1 ) ) +
                 + 1.0L / 128 * cosl( 8.0L * M_PI * k / ( aLen - 1 ) ) ;
         break ;
+    case RV_II :
+        double D[ 4 ] ;
+        taylor( D, 4, 60 ) ;
+        for ( int k = 0 ; k < aLen ; k += 1 )
+            W[ k ] =
+                D[ 0 ] +
+                D[ 1 ] * cosl( 2.0L * M_PI * k / ( aLen - 1 ) ) +
+                D[ 2 ] * cosl( 4.0L * M_PI * k / ( aLen - 1 ) ) +
+                D[ 3 ] * cosl( 6.0L * M_PI * k / ( aLen - 1 ) ) ;
+            break ;
     case RV_III1 :
         break ;
     case RV_III2 :
