@@ -17,7 +17,6 @@
 #include <windowKaiser.h>
 #include <windowHarris.h>
 #include <windowRifeVincent.h>
-#include <windowTaylor.h>
 
 namespace Ui {
 class MainWindow;

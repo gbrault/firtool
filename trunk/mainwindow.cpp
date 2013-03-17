@@ -110,7 +110,7 @@ void MainWindow::on_actionDesign_triggered() {
         kaiser( W.data(), nTaps, ui->dsbAtten->value() ) ;
         break ;
     case 2 :
-        rifeVincent( RV_II, W.data(), nTaps ) ;
+        rifeVincentII( W.data(), nTaps, ui->dsbAtten->value(), (int)ui->dsbSubtype->value() ) ;
         break ;
     case 3 :
         rifeVincent( RV_III4, W.data(), nTaps ) ;
