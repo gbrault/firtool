@@ -3,32 +3,49 @@
 #include <windowRifeVincent.h>
 #include <QDebug>
 
-static void taylor( double D[], int M, double aAtten ) {
+// Class II weighting functions (Taylor)
+// according to BSTJ Feb. 1970, p. 207-209
+
+static void taylor( long double D[], int M, double aAtten ) {
     double R = pow( 10.0, aAtten / 20.0 ) ;
-    qDebug() << R ;
-    double L = log( R + sqrt( R * R - 1.0 ) ) / M_PI ;
+    long double L = log( R + sqrt( R * R - 1.0 ) ) / M_PI ; // (48)
+    long double L2 = L * L ;
 
-    double M_1 = M + 1.0 ;
-    double M_5 = M + 0.5 ;
-    double sigma2 = M_1 * M_1 / ( L * L + sqrt( L * L + M_5 * M_5 ) ) ;
+    long double M_1 = M + 1.0 ;
+    long double M_5 = M + 0.5 ;
+    long double sigma2 = M_1 * M_1 / ( L * L + sqrtl( L2 + M_5 * M_5 ) ) ; // (47)
 
-    D[ 0 ] = 0.0 ;
-    for ( int n = 1 ; n < M ; n += 1 ) {
-        double dp = 1.0 ;
-        double np = 1.0 ;
+    D[ 0 ] = 1.0L ;
+    for ( int n = 1 ; n < M ; n += 1 ) { // (45)
+        long double dp = 1.0L ;
+        long double np = 1.0L ;
+        long double n2 = n * n ;
         for ( int K = 1 ; K < M ; K += 1 ) {
+            long double K2 = K * K ;
             if ( K != n )
-                dp *= 1.0 - n * n / K * K ;
+                dp *= 1.0L - n2 / K2 ;
 
-            double K_5 = K - 0.5 ;
-            np *= 1.0 - n * n / sigma2 / ( L + K_5 * K_5 )  ;
+            long double K_5 = K - 0.5L ;
+            np *= 1.0L - n2 / sigma2 / ( L2 + K_5 * K_5 )  ;
         }
         D[ n ] = - np / dp ;
-        qDebug() << n << D[ n ] ;
+        qDebug() << n << (double)D[ n ] ;
+    }
+}
+
+void rifeVincentII( long double * W, int aLen, double aAtten, int M ) {
+    qDebug() << M ;
+    long double D[ M ] ;
+    taylor( D, M, aAtten ) ;
+    for ( int k = 0 ; k < aLen ; k += 1 ) {
+        W[ k ] = D[ 0 ] ;
+        for ( int m = 1 ; m < M ; m += 1 )
+            W[ k ] += D[ m ] * cosl( 2.0L * m * M_PI * k / ( aLen - 1 ) ) ;
     }
 }
 
 
+// Class I and III
 void rifeVincent( RV_t type, long double * W, int aLen ) {
     switch ( type ) {
     case RV_I1 :
@@ -61,16 +78,6 @@ void rifeVincent( RV_t type, long double * W, int aLen ) {
                 - 8.0L / 128 * cosl( 6.0L * M_PI * k / ( aLen - 1 ) ) +
                 + 1.0L / 128 * cosl( 8.0L * M_PI * k / ( aLen - 1 ) ) ;
         break ;
-    case RV_II :
-        double D[ 4 ] ;
-        taylor( D, 4, 60 ) ;
-        for ( int k = 0 ; k < aLen ; k += 1 )
-            W[ k ] =
-                D[ 0 ] +
-                D[ 1 ] * cosl( 2.0L * M_PI * k / ( aLen - 1 ) ) +
-                D[ 2 ] * cosl( 4.0L * M_PI * k / ( aLen - 1 ) ) +
-                D[ 3 ] * cosl( 6.0L * M_PI * k / ( aLen - 1 ) ) ;
-            break ;
     case RV_III1 :
         break ;
     case RV_III2 :
