@@ -92,26 +92,26 @@ void rifeVincent( RV_t type, long double * W, int aLen ) {
     case RV_III2 :
         for ( int k = 0 ; k < aLen ; k += 1 )
             W[ k ] =
-                +1.0000000L / 2.0 +
-                -1.1968500L / 2.0 * cosl( 2.0L * M_PI * k / ( aLen - 1 ) ) +
-                +0.1968500L / 2.0 * cosl( 4.0L * M_PI * k / ( aLen - 1 ) ) ;
+                +1.0000000L / 2.3937L +
+                -1.1968500L / 2.3937L * cosl( 2.0L * M_PI * k / ( aLen - 1 ) ) +
+                +0.1968500L / 2.3937L * cosl( 4.0L * M_PI * k / ( aLen - 1 ) ) ;
         break ;
     case RV_III3 :
         for ( int k = 0 ; k < aLen ; k += 1 )
             W[ k ] =
-                +0.9999992L / 2.9950724 +
-                -1.4359600L / 2.9950724 * cosl( 2.0L * M_PI * k / ( aLen - 1 ) ) +
-                +0.4975370L / 2.9950724 * cosl( 4.0L * M_PI * k / ( aLen - 1 ) ) +
-                -0.0615762L / 2.9950724 * cosl( 6.0L * M_PI * k / ( aLen - 1 ) ) ;
+                +0.9999992L / 2.9950724L +
+                -1.4359600L / 2.9950724L * cosl( 2.0L * M_PI * k / ( aLen - 1 ) ) +
+                +0.4975370L / 2.9950724L * cosl( 4.0L * M_PI * k / ( aLen - 1 ) ) +
+                -0.0615762L / 2.9950724L * cosl( 6.0L * M_PI * k / ( aLen - 1 ) ) ;
         break ;
     case RV_III4 :
         for ( int k = 0 ; k < aLen ; k += 1 )
             W[ k ] =
-                +1.0035479L / 3.493834 +
-                -1.5662720L / 3.493834 * cos( 2.0L * M_PI * k / ( aLen - 1 ) ) +
-                +0.7254480L / 3.493834 * cos( 4.0L * M_PI * k / ( aLen - 1 ) ) +
-                -0.1806450L / 3.493834 * cos( 6.0L * M_PI * k / ( aLen - 1 ) ) +
-                +0.0179211L / 3.493834 * cos( 8.0L * M_PI * k / ( aLen - 1 ) ) ;
+                +1.0035479L / 3.493834L +
+                -1.5662720L / 3.493834L * cos( 2.0L * M_PI * k / ( aLen - 1 ) ) +
+                +0.7254480L / 3.493834L * cos( 4.0L * M_PI * k / ( aLen - 1 ) ) +
+                -0.1806450L / 3.493834L * cos( 6.0L * M_PI * k / ( aLen - 1 ) ) +
+                +0.0179211L / 3.493834L * cos( 8.0L * M_PI * k / ( aLen - 1 ) ) ;
         break ;
     }
 }
