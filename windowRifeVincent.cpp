@@ -7,12 +7,12 @@
 // according to BSTJ Feb. 1970, p. 207-209
 
 static void taylor( long double D[], int M, double aAtten ) {
-    double R = pow( 10.0, aAtten / 20.0 ) ;
-    long double L = log( R + sqrt( R * R - 1.0 ) ) / M_PI ; // (48)
+    long double R = powl( 10.0L, aAtten / 20.0L ) ;
+    long double L = log( R + sqrtl( R * R - 1.0L ) ) / (long double)M_PI ; // (48)
     long double L2 = L * L ;
 
-    long double M_1 = M + 1.0 ;
-    long double M_5 = M + 0.5 ;
+    long double M_1 = M + 1.0L ;
+    long double M_5 = M + 0.5L ;
     long double sigma2 = M_1 * M_1 / ( L * L + sqrtl( L2 + M_5 * M_5 ) ) ; // (47)
 
     D[ 0 ] = 1.0L ;
@@ -29,25 +29,30 @@ static void taylor( long double D[], int M, double aAtten ) {
             np *= 1.0L - n2 / sigma2 / ( L2 + K_5 * K_5 )  ;
         }
         D[ n ] = - np / dp ;
-        qDebug() << n << (double)D[ n ] ;
+//        qDebug() << n << (double)D[ n ] ;
     }
 }
 
 void rifeVincentII( long double * W, int aLen, double aAtten, int M ) {
-    qDebug() << M ;
     long double D[ M ] ;
     taylor( D, M, aAtten ) ;
+    long double Wm = -1E100 ;
+
     for ( int k = 0 ; k < aLen ; k += 1 ) {
         W[ k ] = D[ 0 ] ;
         for ( int m = 1 ; m < M ; m += 1 )
             W[ k ] += D[ m ] * cosl( 2.0L * m * M_PI * k / ( aLen - 1 ) ) ;
+        if ( Wm < fabsl( W[ k ] ) )
+            Wm = fabsl( W[ k ] ) ;
     }
+    for ( int k = 0 ; k < aLen ; k += 1 )
+        W[ k ] /= Wm ;
 }
-
 
 // Class I and III
 void rifeVincent( RV_t type, long double * W, int aLen ) {
     switch ( type ) {
+    default :
     case RV_I1 :
         for ( int k = 0 ; k < aLen ; k += 1 )
             W[ k ] =
@@ -79,8 +84,17 @@ void rifeVincent( RV_t type, long double * W, int aLen ) {
                 + 1.0L / 128 * cosl( 8.0L * M_PI * k / ( aLen - 1 ) ) ;
         break ;
     case RV_III1 :
+        for ( int k = 0 ; k < aLen ; k += 1 )
+            W[ k ] =
+                + 1.0L / 2 +
+                - 1.0L / 2 * cosl( 2.0L * M_PI * k / ( aLen - 1 ) ) ;
         break ;
     case RV_III2 :
+        for ( int k = 0 ; k < aLen ; k += 1 )
+            W[ k ] =
+                +1.0000000L / 2.0 +
+                -1.1968500L / 2.0 * cosl( 2.0L * M_PI * k / ( aLen - 1 ) ) +
+                +0.1968500L / 2.0 * cosl( 4.0L * M_PI * k / ( aLen - 1 ) ) ;
         break ;
     case RV_III3 :
         for ( int k = 0 ; k < aLen ; k += 1 )
@@ -89,7 +103,7 @@ void rifeVincent( RV_t type, long double * W, int aLen ) {
                 -1.4359600L / 2.9950724 * cosl( 2.0L * M_PI * k / ( aLen - 1 ) ) +
                 +0.4975370L / 2.9950724 * cosl( 4.0L * M_PI * k / ( aLen - 1 ) ) +
                 -0.0615762L / 2.9950724 * cosl( 6.0L * M_PI * k / ( aLen - 1 ) ) ;
-            break ;
+        break ;
     case RV_III4 :
         for ( int k = 0 ; k < aLen ; k += 1 )
             W[ k ] =
