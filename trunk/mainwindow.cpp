@@ -82,6 +82,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     connect( ui->actionExit, SIGNAL( triggered() ), this, SLOT( close() ) ) ;
 
     ui->cbFilterType->setCurrentIndex( 0 ) ;
+    ui->dsbSubtype->setValue( 0 ) ;
 
     // settings
 //    readSettings() ;
@@ -113,7 +114,7 @@ void MainWindow::on_actionDesign_triggered() {
         rifeVincentII( W.data(), nTaps, ui->dsbAtten->value(), (int)ui->dsbSubtype->value() ) ;
         break ;
     case 3 :
-        rifeVincent( RV_III4, W.data(), nTaps ) ;
+        rifeVincent( (RV_t)ui->dsbSubtype->value(), W.data(), nTaps ) ;
         break ;
     case 4 :
         harris( W.data(), nTaps ) ;
@@ -211,7 +212,7 @@ void MainWindow::on_actionSave_Coefs_triggered() {
         return ;
 
     QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Save Coefficient File"), ".", tr( "Xilinx coefficient files (*.coe);;C/C++ include files (*.h);;All files (*.*)" ) ) ;
+        this, tr("Save Coefficient File"), ".", tr( "Xilinx coefficient files (*.coe);;C/C++ include files (*.h);;VHDL files (*.vhd);;All files (*.*)" ) ) ;
     if ( fileName.isEmpty() )
         return ;
 
@@ -241,6 +242,17 @@ void MainWindow::on_actionSave_Coefs_triggered() {
         for ( int i = 0 ; i < Coefs.size() - 1 ; i += 1 )
             stream << QString("    %1").arg( Coefs[ i ], 0, 'g', 9 ) << ",\n" ;
         stream << QString("    %1").arg( Coefs[ Coefs.size() - 1 ], 0, 'g', 9 ) << "\n) ;\n" ;
+    } else
+    if ( fileName.endsWith( ".vhd", Qt::CaseInsensitive ) ) {
+        double range = pow( 2, ui->dsbNBits->value() ) - 1 ;
+        stream << "--\n-- Created by FIRTool at: " << date.toString("MMMM d yyyy") << "\n-- c 2013 www.mediatronix.com\n--\n" ;
+        stream << QString( "    signal coefdata : array( 0 to %1 ) of integer range %2 to %3 := (\n" )
+                      .arg( trunc( Coefs.size() - 1 ) )
+                      .arg( -(int)(range / 2) )
+                      .arg( (int)(range / 2) ) ;
+        for ( int i = 0 ; i < Coefs.size() - 1 ; i += 1 )
+          stream << QString("        %1").arg( trunc( Coefs[ i ] * range ), 0, 'g', 9 ) << ",\n" ;
+        stream << QString("        %1").arg( trunc( Coefs[ Coefs.size() - 1 ] * range ), 0, 'g', 9 ) << "\n    ) ;" ;
     }
     file.close() ;
 }
@@ -263,5 +275,11 @@ void MainWindow::on_twType_currentChanged( int index ) {
 }
 
 void MainWindow::on_cbFilterType_currentIndexChanged( int index ) {
-    ui->dsbAtten->setEnabled( index < 3 ) ;
+    ui->dsbAtten->setEnabled( index <= 2 ) ;
+    ui->dsbSubtype->setEnabled( index == 2 || index == 3 ) ;
+    switch ( index ) {
+    case 2: ui->dsbSubtype->setPrefix( "M: " ) ; break ;
+    case 3: ui->dsbSubtype->setPrefix( "Type: " ) ; break ;
+    default: ui->dsbSubtype->setPrefix( "<not used> " ) ; break ;
+    }
 }
