@@ -46,22 +46,18 @@ win32: {
     RC_FILE = firtool.rc
 }
 macx: {
-    ICON = firtool.ico
+    ICON = toolbox.ico
 }
-
 
 win32 : {
     LIBS += -L$$PWD -lfftw3l-3
-}
-
-win32: {
     QMAKE_LFLAGS += -static-libgcc -static-libstdc++
 }
 
 macx : {
-    LIBS += -L$$PWD/../../../../opt/local/lib/ -lfftw3l
-    INCLUDEPATH += $$PWD/../../../../opt/local/include
-    DEPENDPATH += $$PWD/../../../../opt/local/include
-    PRE_TARGETDEPS += $$PWD/../../../../opt/local/lib/libfftw3l.a
+    LIBS += -L/usr/local/lib/ -lfftw3l
+    INCLUDEPATH += /usr/local/include
+    DEPENDPATH += /usr/local/include
+    PRE_TARGETDEPS += /usr/local/lib/libfftw3l.a
 }
 
