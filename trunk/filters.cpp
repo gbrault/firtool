@@ -12,7 +12,7 @@ void lowPass( long double * T, double stop_freq, long double * W, int aLen ) {
         else
             T[ n + M ] = sin( n * fwT0 ) / ( n * M_PI ) * W[ n + M ] ;
 
-    double scale = 2 * fabs( T[ 0 + M ] ) ;
+    long double scale = 2.0L * fabsl( T[ 0 + M ] ) ;
     for( int i = 0 ; i < aLen ; i++ )
         T[ i ] /= scale ;
 }
@@ -27,7 +27,7 @@ void highPass( long double * T, double start_freq, long double * W, int aLen ) {
         else
             T[ n + M ] = -sin( n * fwT0 ) / ( n * M_PI ) * W[ n + M ] ;
 
-    double scale = 2 * fabs( T[ 0 + M ] ) ;
+    long double scale = 2.0L * fabsl( T[ 0 + M ] ) ;
     for( int i = 0 ; i < aLen ; i++ )
         T[ i ] /= scale ;
 }
@@ -41,9 +41,9 @@ void bandPass( long double * T, double start_freq, double stop_freq, long double
         if ( n == 0 )
             T[ n + M ] = ( fwT1 - fwT0 ) * W[ n + M ] / M_PI ;
         else
-            T[ n + M ] = ( sin(n * fwT1 ) - sin( n * fwT0 ) ) * W[ n + M ] / ( n * M_PI ) ;
+            T[ n + M ] = ( sin( n * fwT1 ) - sin( n * fwT0 ) ) * W[ n + M ] / ( n * M_PI ) ;
 
-    double scale = 2 * fabs( T[ 0 + M ] ) ;
+    long double scale = 2.0L * fabsl( T[ 0 + M ] ) ;
     for( int i = 0 ; i < aLen ; i++ )
         T[ i ] /= scale ;
 }
@@ -55,11 +55,11 @@ void bandStop( long double * T, double stop_freq, double start_freq, long double
 
     for ( int n = -M ; n <= M ; n++ )
         if ( n == 0 )
-            T[ n + M ] = 1.0L - ( ( fwT1 - fwT0 ) * W[ n + M ] / M_PI ) ;
+            T[ n + M ] = 1.0L - ( fwT1 - fwT0 ) * W[ n + M ] / M_PI ;
         else
-            T[ n + M ] = ( sin( n * fwT0 ) - sin(n * fwT1 ) ) * W[ n + M ] / ( n * M_PI ) ;
+            T[ n + M ] = ( sin( n * fwT0 ) - sin( n * fwT1 ) ) * W[ n + M ] / ( n * M_PI ) ;
 
-    double scale = 2 * fabs( T[ 0 + M ] ) ;
+    long double scale = 2.0L * fabsl( T[ 0 + M ] ) ;
     for( int i = 0 ; i < aLen ; i++ )
         T[ i ] /= scale ;
 }
