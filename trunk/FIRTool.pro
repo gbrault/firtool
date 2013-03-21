@@ -22,7 +22,11 @@ SOURCES += \
     fftw.cpp \
     windowKaiser.cpp \
     windowHarris.cpp \
-    windowRifeVincent.cpp
+    windowRifeVincent.cpp \
+    zolotarev.c \
+    elliptic.c \
+    zolotarevFIR.cpp \
+    remez.c
 
 HEADERS  += \
     mainwindow.h \
@@ -34,7 +38,11 @@ HEADERS  += \
     windowHarris.h \
     freqchar.h \
     windowCheby.h \
-    windowKaiser.h
+    windowKaiser.h \
+    zolotarev.h \
+    elliptic.h \
+    zolotarevFIR.hpp \
+    remez.h
 
 FORMS    += mainwindow.ui
 

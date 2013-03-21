@@ -92,6 +92,7 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
+
 void MainWindow::on_actionDesign_triggered() {
     int nTaps = (int)ui->dsbNTaps->value() | 1 ;
     ui->dsbNTaps->setValue( nTaps ) ;
@@ -147,6 +148,9 @@ void MainWindow::on_actionDesign_triggered() {
         break ;
     case 5 :
         rootRaisedCosine( T.data(), ui->dsbRRCSPS->value(), ui->dsbRRCBeta->value(), nTaps ) ;
+        break ;
+    case 6 :
+        zolotarevFIR( T.data(), ui->dsbZolot->value(), ui->dsbZolot->value(), nTaps ) ;
         break ;
     }
 
