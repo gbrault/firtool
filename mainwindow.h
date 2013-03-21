@@ -11,6 +11,7 @@
 #include "qcustomplot.h"
 
 #include "filters.h"
+#include "zolotarev.hpp"
 #include "freqchar.h"
 
 #include <windowCheby.h>

@@ -41,7 +41,7 @@
          <enum>QTabWidget::Triangular</enum>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>6</number>
         </property>
         <widget class="QWidget" name="tsbLP">
          <attribute name="title">
@@ -318,7 +318,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_12">
+        <widget class="QWidget" name="tsbGauss">
          <attribute name="title">
           <string>Gaussian</string>
          </attribute>
@@ -397,7 +397,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_11">
+        <widget class="QWidget" name="tsbRRC">
          <attribute name="title">
           <string>RRC</string>
          </attribute>
@@ -460,6 +460,29 @@
           </item>
           <item>
            <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tsbZolot">
+         <attribute name="title">
+          <string>Zolotarev</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QDoubleSpinBox" name="dsbZolot"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_8">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
