@@ -41,8 +41,8 @@
 #define NEGATIVE       0
 #define POSITIVE       1
 
-#define Pi             3.1415926535897932
-#define Pi2            6.2831853071795865
+//#define Pi             3.1415926535897932
+//#define Pi2            6.2831853071795865
 
 #define GRIDDENSITY    16
 #define MAXITERATIONS  40
@@ -74,11 +74,10 @@
  * double W[]        - Weight function on the dense grid [gridsize]
  *******************/
 
-void CreateDenseGrid(int r, int numtaps, int numband, const double bands[],
+static void CreateDenseGrid(int r, int numtaps, int numband, const double bands[],
                      const double des[], const double weight[], int gridsize,
                      double Grid[], double D[], double W[],
-                     int symmetry, int griddensity)
-{
+                     int symmetry, int griddensity) {
    int i, j, k, band;
    double delf, lowf, highf, grid0;
 
@@ -136,8 +135,7 @@ void CreateDenseGrid(int r, int numtaps, int numband, const double bands[],
  * int Ext[]    - Extremal indexes to dense frequency grid [r+1]
  ********************/
 
-void InitialGuess(int r, int Ext[], int gridsize)
-{
+static void InitialGuess(int r, int Ext[], int gridsize) {
    int i;
 
    for (i=0; i<=r; i++)
@@ -165,9 +163,8 @@ void InitialGuess(int r, int Ext[], int gridsize)
  * double y[]    - 'C' in Oppenheim & Schafer [r+1]
  ***********************/
 
-void CalcParms(int r, int Ext[], double Grid[], double D[], double W[],
-                double ad[], double x[], double y[])
-{
+static void CalcParms(int r, int Ext[], double Grid[], double D[], double W[],
+                double ad[], double x[], double y[]) {
    int i, j, k, ld;
    double sign, xi, delta, denom, numer;
 
@@ -175,7 +172,7 @@ void CalcParms(int r, int Ext[], double Grid[], double D[], double W[],
  * Find x[]
  */
    for (i=0; i<=r; i++)
-      x[i] = cos(Pi2 * Grid[Ext[i]]);
+      x[i] = cos(M_PI * 2.0 * Grid[Ext[i]]);
 
 /*
  * Calculate ad[]  - Oppenheim & Schafer eq 7.132
@@ -242,13 +239,12 @@ void CalcParms(int r, int Ext[], double Grid[], double D[], double W[],
  * Returns double value of A[freq]
  *********************/
 
-double ComputeA(double freq, int r, double ad[], double x[], double y[])
-{
+static double ComputeA(double freq, int r, double ad[], double x[], double y[]) {
    int i;
    double xc, c, denom, numer;
 
    denom = numer = 0;
-   xc = cos(Pi2 * freq);
+   xc = cos(M_PI * 2.0 * freq);
    for (i=0; i<=r; i++)
    {
       c = xc - x[i];
@@ -290,10 +286,9 @@ double ComputeA(double freq, int r, double ad[], double x[], double y[])
  * double E[]    - Error function on dense grid [gridsize]
  ************************/
 
-void CalcError(int r, double ad[], double x[], double y[],
+static void CalcError(int r, double ad[], double x[], double y[],
                int gridsize, double Grid[],
-               double D[], double W[], double E[])
-{
+               double D[], double W[], double E[]) {
    int i;
    double A;
 
@@ -328,9 +323,7 @@ void CalcError(int r, double ad[], double x[], double y[],
  * -------
  * int    Ext[]    - New indexes to extremal frequencies [r+1]
  ************************/
-int Search(int r, int Ext[],
-            int gridsize, double E[])
-{
+static int Search(int r, int Ext[], int gridsize, double E[]) {
    int i, j, k, l, extra;     /* Counters */
    int up, alt;
 //   int *foundExt;             /* Array of found extremals */
@@ -465,8 +458,7 @@ int Search(int r, int Ext[],
  * -------
  * double h[] - Impulse Response of final filter [N]
  *********************/
-void FreqSample(int N, double A[], double h[], int symm)
-{
+static void FreqSample(int N, double A[], long double h[], int symm) {
    int n, k;
    double x, val, M;
 
@@ -478,7 +470,7 @@ void FreqSample(int N, double A[], double h[], int symm)
          for (n=0; n<N; n++)
          {
             val = A[0];
-            x = Pi2 * (n - M)/N;
+            x = M_PI * 2.0 * (n - M)/N;
             for (k=1; k<=M; k++)
                val += 2.0 * A[k] * cos(x*k);
             h[n] = val/N;
@@ -489,7 +481,7 @@ void FreqSample(int N, double A[], double h[], int symm)
          for (n=0; n<N; n++)
          {
             val = A[0];
-            x = Pi2 * (n - M)/N;
+            x = M_PI * 2.0 * (n - M)/N;
             for (k=1; k<=(N/2-1); k++)
                val += 2.0 * A[k] * cos(x*k);
             h[n] = val/N;
@@ -503,7 +495,7 @@ void FreqSample(int N, double A[], double h[], int symm)
          for (n=0; n<N; n++)
          {
             val = 0;
-            x = Pi2 * (n - M)/N;
+            x = M_PI * 2.0 * (n - M)/N;
             for (k=1; k<=M; k++)
                val += 2.0 * A[k] * sin(x*k);
             h[n] = val/N;
@@ -513,8 +505,8 @@ void FreqSample(int N, double A[], double h[], int symm)
       {
           for (n=0; n<N; n++)
           {
-             val = A[N/2] * sin(Pi * (n - M));
-             x = Pi2 * (n - M)/N;
+             val = A[N/2] * sin(M_PI * (n - M));
+             x = M_PI * 2.0 * (n - M)/N;
              for (k=1; k<=(N/2-1); k++)
                 val += 2.0 * A[k] * sin(x*k);
              h[n] = val/N;
@@ -541,8 +533,7 @@ void FreqSample(int N, double A[], double h[], int symm)
  * Returns 0 if the result has not converged
  ********************/
 
-int isDone(int r, int Ext[], double E[])
-{
+static int isDone(int r, int Ext[], double E[]) {
    int i;
    double min, max, current;
 
@@ -581,11 +572,8 @@ int isDone(int r, int Ext[], double E[])
  * returns         - true on success, false on failure to converge
  ********************/
 
-int remez(double h[], int numtaps,
-	  int numband, const double bands[], 
-	  const double des[], const double weight[],
-	  int type, int griddensity)
-{
+int remez( long double h[], int numtaps, int numband, const double bands[],
+      const double des[], const double weight[], int type, int griddensity ) {
 //   double *Grid, *W, *D, *E;
    int    i, iter, gridsize, r ;
 // *Ext;
@@ -670,7 +658,7 @@ int remez(double h[], int numtaps,
       {
          for (i=0; i<gridsize; i++)
          {
-            c = cos(Pi * Grid[i]);
+            c = cos(M_PI * Grid[i]);
             D[i] /= c;
             W[i] *= c; 
          }
@@ -682,7 +670,7 @@ int remez(double h[], int numtaps,
       {
          for (i=0; i<gridsize; i++)
          {
-            c = sin(Pi2 * Grid[i]);
+            c = sin(M_PI * 2.0 * Grid[i]);
             D[i] /= c;
             W[i] *= c;
          }
@@ -691,7 +679,7 @@ int remez(double h[], int numtaps,
       {
          for (i=0; i<gridsize; i++)
          {
-            c = sin(Pi * Grid[i]);
+            c = sin(M_PI * Grid[i]);
             D[i] /= c;
             W[i] *= c;
          }
@@ -727,14 +715,14 @@ int remez(double h[], int numtaps,
          if (numtaps%2)
             c = 1;
          else
-            c = cos(Pi * (double)i/numtaps);
+            c = cos(M_PI * (double)i/numtaps);
       }
       else
       {
          if (numtaps%2)
-            c = sin(Pi2 * (double)i/numtaps);
+            c = sin(M_PI * 2.0 * (double)i/numtaps);
          else
-            c = sin(Pi * (double)i/numtaps);
+            c = sin(M_PI * (double)i/numtaps);
       }
       taps[i] = ComputeA((double)i/numtaps, r, ad, x, y)*c;
    }
