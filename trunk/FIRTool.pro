@@ -25,8 +25,8 @@ SOURCES += \
     windowRifeVincent.cpp \
     zolotarev.c \
     elliptic.c \
-    zolotarevFIR.cpp \
     remez.c
+#    zolotarevFIR.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -41,8 +41,8 @@ HEADERS  += \
     windowKaiser.h \
     zolotarev.h \
     elliptic.h \
-    zolotarevFIR.hpp \
     remez.h
+#    zolotarevFIR.hpp
 
 FORMS    += mainwindow.ui
 

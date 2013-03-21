@@ -150,10 +150,19 @@ void MainWindow::on_actionDesign_triggered() {
         rootRaisedCosine( T.data(), ui->dsbRRCSPS->value(), ui->dsbRRCBeta->value(), nTaps ) ;
         break ;
     case 6 :
-        zolotarevFIR( T.data(), ui->dsbZolot->value(), ui->dsbZolot->value(), nTaps ) ;
+//        zolotarevFIR( T.data(), ui->dsbZolot->value(), ui->dsbZolot->value(), nTaps ) ;
+        double bands[ 8 ] = { 0.0, 0.2, 0.3, 0.5, 0.0, 0.2, 0.3, 0.5 } ;
+        double des[ 4 ] = { 0.0, 0.2, 0.3, 0.5 } ;
+        double weight[ 4 ] = { 0.0, 0.2, 0.3, 0.5 } ;
+        if ( remez( T.data(), nTaps, 4, bands, des, weight, 0, 16 ) ) {
+        }
         break ;
     }
 
+//    int remez( long double h[], int numtaps,
+//          int numband, const double bands[],
+//          const double des[], const double weight[],
+//          int type, int griddensity ) ;
 
     QVector<double> w( nTaps ) ;
     for ( int i = 0 ; i < nTaps ; i += 1 )
