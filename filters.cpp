@@ -4,8 +4,8 @@
 
 void lowPass( long double * T, double stop_freq, long double * W, int aLen ) {
     int M = ( aLen - 1 ) / 2 ;
+    long double fwT0 = 2.0L * M_PI * stop_freq ;
 
-    double fwT0 = 2 * M_PI * stop_freq ;
     for ( int n = -M ; n <= M ; n++ )
         if ( n == 0 )
             T[ n + M ] = fwT0 / M_PI * W[ n + M ] ;
@@ -19,7 +19,7 @@ void lowPass( long double * T, double stop_freq, long double * W, int aLen ) {
 
 void highPass( long double * T, double start_freq, long double * W, int aLen ) {
     int M = ( aLen - 1 ) / 2 ;
-    double fwT0 = 2 * M_PI * start_freq ;
+    long double fwT0 = 2.0L * M_PI * start_freq ;
 
     for ( int n = -M; n <= M; n++ )
         if ( n == 0 )
@@ -34,8 +34,8 @@ void highPass( long double * T, double start_freq, long double * W, int aLen ) {
 
 void bandPass( long double * T, double start_freq, double stop_freq, long double * W, int aLen ) {
     int M = ( aLen - 1 ) / 2 ;
-    double fwT0 = 2 * M_PI * start_freq ;
-    double fwT1 = 2 * M_PI * stop_freq ;
+    long double fwT0 = 2.0L * M_PI * start_freq ;
+    long double fwT1 = 2.0L * M_PI * stop_freq ;
 
     for ( int n = -M; n <= M; n++ )
         if ( n == 0 )
@@ -50,8 +50,8 @@ void bandPass( long double * T, double start_freq, double stop_freq, long double
 
 void bandStop( long double * T, double stop_freq, double start_freq, long double * W, int aLen ) {
     int M = ( aLen - 1 ) / 2 ;
-    double fwT0 = 2 * M_PI * stop_freq ;
-    double fwT1 = 2 * M_PI * start_freq ;
+    long double fwT0 = 2.0L * M_PI * stop_freq ;
+    long double fwT1 = 2.0L * M_PI * start_freq ;
 
     for ( int n = -M ; n <= M ; n++ )
         if ( n == 0 )
@@ -65,16 +65,16 @@ void bandStop( long double * T, double stop_freq, double start_freq, long double
 }
 
 void gaussian( long double * T, double spb, double bt, int aLen ) {
-    double dt = 1.0 / spb ;
-    double s = 1.0 / ( sqrt( log( 2.0 ) ) / ( 2 * M_PI * bt ) ) ;
-    double t0 = -0.5 * aLen ;
-    double ts ;
-    double scale = 0 ;
+    long double dt = 1.0L / spb ;
+    long double s = 1.0 / ( sqrtl( logl( 2.0L ) ) / ( 2.0L * (long double)M_PI * bt ) ) ;
+
+    long double t0 = -0.5L * aLen - 0.5L ;
+    long double scale = 0.0L ;
 
     for ( int i = 0 ; i < aLen ; i++ ) {
-        t0++ ;
-        ts = s * dt * t0 ;
-        T[i] = exp( -0.5 * ts * ts ) ;
+        t0 += 1.0L ;
+        long double ts = s * dt * t0 ;
+        T[ i ] = expl( -0.5L * ts * ts ) ;
         scale += T[ i ] ;
     }
     for ( int i = 0 ; i < aLen ; i++ )
@@ -83,6 +83,7 @@ void gaussian( long double * T, double spb, double bt, int aLen ) {
 
 void rootRaisedCosine( long double * T, double spb, double alpha, int aLen ) {
     double scale = 0 ;
+
     for ( int i = 0 ; i < aLen ; i++ ) {
         double x1, x2, x3, num, den ;
         double xindx = i - aLen / 2 ;

@@ -41,12 +41,24 @@ private slots:
     void on_twType_currentChanged(int index);
     void on_cbFilterType_currentIndexChanged(int index);
 
+    void on_pbRemezEstimate_clicked();
+
 private:
+    void doWindowed();
+    void doRemez();
+    void doRRC();
+    void doGauss();
+
+    void doShow();
+
     Ui::MainWindow *ui;
     QCustomPlot * customPlotFreq ;
     QCustomPlot * customPlotTime ;
 
+    int nTaps ;
+
     QVector<long double> Coefs ;
+    QVector<long double> Window ;
 } ;
 
 #endif // MAINWINDOW_H

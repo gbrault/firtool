@@ -23,9 +23,7 @@ SOURCES += \
     windowKaiser.cpp \
     windowHarris.cpp \
     windowRifeVincent.cpp \
-    zolotarev.c \
-    elliptic.c \
-    remez.c
+    remez.cpp
 #    zolotarevFIR.cpp
 
 HEADERS  += \
@@ -39,8 +37,6 @@ HEADERS  += \
     freqchar.h \
     windowCheby.h \
     windowKaiser.h \
-    zolotarev.h \
-    elliptic.h \
     remez.h
 #    zolotarevFIR.hpp
 
