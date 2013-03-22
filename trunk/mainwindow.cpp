@@ -62,7 +62,10 @@ MainWindow::MainWindow( QWidget *parent ) :
 
     ui->cbFilterType->addItems(
         QStringList() << "Chebyshev" << "Kaiser" << "Taylor"
-            << "Rife-Vincent" << "harris" << "Nuttall" << "Flat top" );
+            << "Rife-Vincent" << "harris" << "Nuttall" << "Flat top"  );
+
+    ui->cbRemezType->addItems(
+                QStringList() << "Band Pass" << "Differentiator" << "Hilbert" ) ;
 
     ui->twCoefs->setHeaderLabels( QStringList() << "Index" << "Coefs" << "Actual" << "Window" ) ;
     ui->twCoefs->setColumnWidth( 0, 60 ) ;
@@ -94,25 +97,38 @@ MainWindow::~MainWindow() {
 
 
 void MainWindow::on_actionDesign_triggered() {
-    int nTaps = (int)ui->dsbNTaps->value() | 1 ;
+    Window.clear() ;
+    Coefs.clear() ;
+
+    nTaps = (int)ui->dsbNTaps->value() | 1 ;
     ui->dsbNTaps->setValue( nTaps ) ;
 
-    QVector<double> x( nTaps ) ;
-    for ( int i = 0 ; i < nTaps ; i += 1 )
-        x[ i ] = (double)i ;
+    switch ( ui->twMethod->currentIndex() ) {
+    case 0 : doWindowed() ; break ;
+    case 1 : doRemez() ; break ;
+    case 2 : doRRC() ; break ;
+    case 3 : doGauss() ; break ;
+    }
+    doShow() ;
+}
 
+void MainWindow::doWindowed( void ) {
     QVector<long double> W( nTaps ) ;
+    for ( int n = 0 ; n < nTaps ; n += 1 )
+        W[ n ] = 0.0L ;
+
+    double atten = ui->dsbWindowAtten->value() ;
 
     // filter window
     switch ( ui->cbFilterType->currentIndex() ) {
     case 0 :
-        chebyshev( W.data(), nTaps, ui->dsbAtten->value() ) ;
+        chebyshev( W.data(), nTaps, atten ) ;
         break ;
     case 1 :
-        kaiser( W.data(), nTaps, ui->dsbAtten->value() ) ;
+        kaiser( W.data(), nTaps, atten ) ;
         break ;
     case 2 :
-        rifeVincentII( W.data(), nTaps, ui->dsbAtten->value(), (int)ui->dsbSubtype->value() ) ;
+        rifeVincentII( W.data(), nTaps, atten, (int)ui->dsbSubtype->value() ) ;
         break ;
     case 3 :
         rifeVincent( (RV_t)ui->dsbSubtype->value(), W.data(), nTaps ) ;
@@ -127,6 +143,7 @@ void MainWindow::on_actionDesign_triggered() {
         flattop( W.data(), nTaps ) ;
         break ;
     }
+    Window = W ;
 
     // filter type
     QVector<long double> T( nTaps ) ;
@@ -143,39 +160,110 @@ void MainWindow::on_actionDesign_triggered() {
     case 3 :
         bandStop( T.data(), ui->dsbBSStop->value(), ui->dsbBSStart->value(), W.data(), nTaps ) ;
         break ;
-    case 4 :
-        gaussian( T.data(), ui->dsbGSPS->value(), ui->dsbGBT->value(), nTaps ) ;
+    }
+    Coefs = T ;
+}
+
+void MainWindow::doRemez( void ) {
+    QVector<long double> T( nTaps ) ;
+    QVector<double> bands ;
+    QVector<double> response ;
+    QVector<double> weight ;
+    int nbands = 0 ;
+
+    double tw = ui->dsbRemezTW->value() ;
+    double tf, tfl, tfr ;
+
+    switch ( ui->twType->currentIndex() ) {
+    case 0 :
+        nbands = 2 ;
+        tf = ui->dsbLPStop->value() ;
+        bands << 0.0 << tf-tw << tf+tw << 0.5 ;
+        response << 1 << 1 << 0 << 0 ;
+        weight << 1 << 1 ;
         break ;
-    case 5 :
-        rootRaisedCosine( T.data(), ui->dsbRRCSPS->value(), ui->dsbRRCBeta->value(), nTaps ) ;
+    case 1 :
+        nbands = 2 ;
+        tf = ui->dsbHPStart->value() ;
+        bands << 0.0 << tf-tw << tf+tw << 0.5 ;
+        response << 0 << 0 << 1 << 1 ;
+        weight << 1 << 1 ;
         break ;
-    case 6 :
-//        zolotarevFIR( T.data(), ui->dsbZolot->value(), ui->dsbZolot->value(), nTaps ) ;
-        double bands[ 8 ] = { 0.0, 0.2, 0.3, 0.5, 0.0, 0.2, 0.3, 0.5 } ;
-        double des[ 4 ] = { 0.0, 0.2, 0.3, 0.5 } ;
-        double weight[ 4 ] = { 0.0, 0.2, 0.3, 0.5 } ;
-        if ( remez( T.data(), nTaps, 4, bands, des, weight, 0, 16 ) ) {
-        }
+    case 2 :
+        nbands = 3 ;
+        tfl = ui->dsbBPStart->value() ;
+        tfr = ui->dsbBPStop->value() ;
+        bands << 0.0 << tfl-tw << tfl+tw << tfr-tw << tfr+tw << 0.5 ;
+        response << 0 << 0 << 1 << 1 << 0 << 0 ;
+        weight << 1 << 1 << 1 ;
         break ;
+    case 3 :
+        nbands = 3 ;
+        tfl = ui->dsbBSStop->value() ;
+        tfr = ui->dsbBSStart->value() ;
+        bands << 0.0 << tfl-tw << tfl+tw << tfr-tw << tfr+tw << 0.5 ;
+        response << 1 << 1 << 0 << 0 << 1 << 1 ;
+        weight << 1 << 1 << 1 ;
+        break ;
+    default :
+        return ;
     }
 
-//    int remez( long double h[], int numtaps,
-//          int numband, const double bands[],
-//          const double des[], const double weight[],
-//          int type, int griddensity ) ;
+    int err = remez( T.data(), nTaps, nbands, bands.data(), response.data(), weight.data(), BANDPASS, 64 ) ;
 
-    QVector<double> w( nTaps ) ;
-    for ( int i = 0 ; i < nTaps ; i += 1 )
-        w[ i ] = W[ i ] ;
-    customPlotTime->graph(0)->setData( x, w ) ;
-    QVector<double> t( nTaps ) ;
-    for ( int i = 0 ; i < nTaps ; i += 1 )
-        t[ i ] = T[ i ] ;
-    customPlotTime->graph(1)->setData( x, t ) ;
+    switch ( err ) {
+    case -1 :
+        statusBar()->showMessage( "Remez: failed to converge", 2000 ) ;
+        break ;
+    case -2 :
+        statusBar()->showMessage( "Remez: insufficient extremals -- cannot continue", 2000 ) ;
+        break ;
+    case -3 :
+        statusBar()->showMessage( "Remez: too many extremals -- cannot continue", 2000 ) ;
+        break ;
+    default :
+        Coefs = T ;
+    }
+}
 
+void MainWindow::doRRC( void ) {
+    QVector<long double> T( nTaps ) ;
+    rootRaisedCosine( T.data(), ui->dsbRRCSPS->value(), ui->dsbRRCBeta->value(), nTaps ) ;
+    Coefs = T ;
+}
+
+void MainWindow::doGauss( void ) {
+    QVector<long double> T( nTaps ) ;
+    gaussian( T.data(), ui->dsbGSPS->value(), ui->dsbGBT->value(), nTaps ) ;
+    Coefs = T ;
+}
+
+void MainWindow::doShow( void ) {
+    customPlotTime->graph(0)->clearData();
+    customPlotTime->graph(1)->clearData();
+    customPlotFreq->graph(0)->clearData();
+
+    QVector<double> x( nTaps ) ;
+    for ( int i = 0 ; i < nTaps ; i += 1 )
+        x[ i ] = (double)i ;
+
+    if ( ! Window.isEmpty() ) {
+        QVector<double> w( nTaps ) ;
+        for ( int i = 0 ; i < nTaps ; i += 1 )
+            w[ i ] = Window[ i ] ;
+        customPlotTime->graph(0)->setData( x, w ) ;
+    }
+    if ( ! Coefs.isEmpty() ) {
+        QVector<double> t( nTaps ) ;
+        for ( int i = 0 ; i < nTaps ; i += 1 )
+            t[ i ] = Coefs[ i ] ;
+        customPlotTime->graph(1)->setData( x, t ) ;
+    }
     customPlotTime->rescaleAxes();
     customPlotTime->replot();
 
+    if ( Coefs.isEmpty() )
+        return ;
 
     int FFTLEN = nTaps < 2048 ? 2048 : nTaps ;
 
@@ -184,7 +272,7 @@ void MainWindow::on_actionDesign_triggered() {
         x2[ i ] = (double)i / FFTLEN ;
 
     QVector<long double> F( 2 * FFTLEN ) ;
-    freqChar( T.data(), F.data(), nTaps, FFTLEN ) ;
+    freqChar( Coefs.data(), F.data(), nTaps, FFTLEN ) ;
 
     QVector<double> M( FFTLEN ) ;
     magnitude( F.data(), M.data(), FFTLEN ) ;
@@ -211,13 +299,14 @@ void MainWindow::on_actionDesign_triggered() {
     for ( int i = 0 ; i < nTaps ; i += 1 ) {
         QStringList columns ;
         columns << QString("%1").arg( i ) ;
-        columns << QString("%1").arg( trunc( T[ i ] * 1E9 ) / 1E9, 0, 'g', 9 ) ;
-        columns << QString("%1").arg( trunc( T[ i ] * range ), 0, 'g', 9 ) ;
-        columns << QString("%1").arg( trunc( W[ i ] * 1E9 ) / 1E9, 0, 'g', 9 ) ;
+        columns << QString("%1").arg( trunc( Coefs[ i ] * 1E9 ) / 1E9, 0, 'g', 9 ) ;
+        columns << QString("%1").arg( trunc( Coefs[ i ] * range ), 0, 'g', 9 ) ;
+        if ( ! Window.isEmpty() )
+            columns << QString("%1").arg( trunc( Window[ i ] * 1E9 ) / 1E9, 0, 'g', 9 ) ;
+        else
+            columns << "" ;
         ui->twCoefs->addTopLevelItem( new QTreeWidgetItem( columns ) ) ;
     }
-
-    Coefs = T ;
 }
 
 void MainWindow::on_actionSave_Coefs_triggered() {
@@ -288,11 +377,20 @@ void MainWindow::on_twType_currentChanged( int index ) {
 }
 
 void MainWindow::on_cbFilterType_currentIndexChanged( int index ) {
-    ui->dsbAtten->setEnabled( index <= 2 ) ;
+    ui->dsbWindowAtten->setEnabled( index <= 2 ) ;
     ui->dsbSubtype->setEnabled( index == 2 || index == 3 ) ;
     switch ( index ) {
     case 2: ui->dsbSubtype->setPrefix( "M: " ) ; break ;
     case 3: ui->dsbSubtype->setPrefix( "Type: " ) ; break ;
     default: ui->dsbSubtype->setPrefix( "<not used> " ) ; break ;
     }
+}
+
+void MainWindow::on_pbRemezEstimate_clicked() {
+    // remezord
+    //    dF = fs - fp ;
+    //    Dinf = log10(ds) * ( 5.309e-3 * log10(dp)**2 + 7.114e-2 * log10(dp) + -4.761e-1 ) +
+    //      -2.66e-3 * log10(dp)**2 + -5.941e-1 * log10(dp) + -4.278e-1 ;
+    //    f = 11.01217 + 0.51244 * ( log10(dp) - log10(ds) ) ;
+    //    N1 = Dinf / dF - f * dF + 1 ;
 }
