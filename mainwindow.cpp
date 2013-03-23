@@ -61,11 +61,10 @@ MainWindow::MainWindow( QWidget *parent ) :
     customPlotTime->setInteraction(QCustomPlot::iSelectPlottables); // allow selection of graphs via mouse click
 
     ui->cbFilterType->addItems(
-        QStringList() << "Chebyshev" << "Kaiser" << "Taylor"
-            << "Rife-Vincent" << "harris" << "Nuttall" << "Flat top"  );
-
-    ui->cbRemezType->addItems(
-                QStringList() << "Band Pass" << "Differentiator" << "Hilbert" ) ;
+        QStringList()
+            << " Taylor" << " Rife-Vincent"
+            << " harris" << " Nuttall" << " Flat top"
+    ) ;
 
     ui->twCoefs->setHeaderLabels( QStringList() << "Index" << "Coefs" << "Actual" << "Window" ) ;
     ui->twCoefs->setColumnWidth( 0, 60 ) ;
@@ -104,12 +103,70 @@ void MainWindow::on_actionDesign_triggered() {
     ui->dsbNTaps->setValue( nTaps ) ;
 
     switch ( ui->twMethod->currentIndex() ) {
-    case 0 : doWindowed() ; break ;
-    case 1 : doRemez() ; break ;
-    case 2 : doRRC() ; break ;
-    case 3 : doGauss() ; break ;
+    case 0 : doCheby() ; break ;
+    case 1 : doKaiser() ; break ;
+    case 2 : doRemez() ; break ;
+    case 3 : doWindowed() ; break ;
+    case 4 : doRRC() ; break ;
+    case 5 : doGauss() ; break ;
     }
     doShow() ;
+}
+
+void MainWindow::doCheby( void ) {
+    QVector<long double> W( nTaps ) ;
+    for ( int n = 0 ; n < nTaps ; n += 1 )
+        W[ n ] = 0.0L ;
+
+    double beta = ui->dsbChebyBeta->value() ;
+    chebyshev( W.data(), nTaps, beta ) ;
+    Window = W ;
+
+    // filter type
+    QVector<long double> T( nTaps ) ;
+    switch ( ui->twType->currentIndex() ) {
+    case 0 :
+        lowPass( T.data(), ui->dsbLPStop->value(), W.data(), nTaps ) ;
+        break ;
+    case 1 :
+        highPass( T.data(), ui->dsbHPStart->value(), W.data(), nTaps ) ;
+        break ;
+    case 2 :
+        bandPass( T.data(), ui->dsbBPStart->value(), ui->dsbBPStop->value(), W.data(), nTaps ) ;
+        break ;
+    case 3 :
+        bandStop( T.data(), ui->dsbBSStop->value(), ui->dsbBSStart->value(), W.data(), nTaps ) ;
+        break ;
+    }
+    Coefs = T ;
+}
+
+void MainWindow::doKaiser( void ) {
+    QVector<long double> W( nTaps ) ;
+    for ( int n = 0 ; n < nTaps ; n += 1 )
+        W[ n ] = 0.0L ;
+
+    double beta = ui->dsbKaiserBeta->value() ;
+    kaiser( W.data(), nTaps, beta ) ;
+    Window = W ;
+
+    // filter type
+    QVector<long double> T( nTaps ) ;
+    switch ( ui->twType->currentIndex() ) {
+    case 0 :
+        lowPass( T.data(), ui->dsbLPStop->value(), W.data(), nTaps ) ;
+        break ;
+    case 1 :
+        highPass( T.data(), ui->dsbHPStart->value(), W.data(), nTaps ) ;
+        break ;
+    case 2 :
+        bandPass( T.data(), ui->dsbBPStart->value(), ui->dsbBPStop->value(), W.data(), nTaps ) ;
+        break ;
+    case 3 :
+        bandStop( T.data(), ui->dsbBSStop->value(), ui->dsbBSStart->value(), W.data(), nTaps ) ;
+        break ;
+    }
+    Coefs = T ;
 }
 
 void MainWindow::doWindowed( void ) {
@@ -117,29 +174,23 @@ void MainWindow::doWindowed( void ) {
     for ( int n = 0 ; n < nTaps ; n += 1 )
         W[ n ] = 0.0L ;
 
-    double atten = ui->dsbWindowAtten->value() ;
+    double atten = ui->dsbAtten->value() ;
 
     // filter window
     switch ( ui->cbFilterType->currentIndex() ) {
     case 0 :
-        chebyshev( W.data(), nTaps, atten ) ;
-        break ;
-    case 1 :
-        kaiser( W.data(), nTaps, atten ) ;
-        break ;
-    case 2 :
         rifeVincentII( W.data(), nTaps, atten, (int)ui->dsbSubtype->value() ) ;
         break ;
-    case 3 :
+    case 1 :
         rifeVincent( (RV_t)ui->dsbSubtype->value(), W.data(), nTaps ) ;
         break ;
-    case 4 :
+    case 2 :
         harris( W.data(), nTaps ) ;
         break ;
-    case 5 :
+    case 3 :
         nuttall( W.data(), nTaps ) ;
         break ;
-    case 6 :
+    case 4 :
         flattop( W.data(), nTaps ) ;
         break ;
     }
@@ -171,7 +222,7 @@ void MainWindow::doRemez( void ) {
     QVector<double> weight ;
     int nbands = 0 ;
 
-    double tw = ui->dsbRemezTW->value() ;
+    double tw = ui->dsbTW->value() / 2.0 ;
     double tf, tfl, tfr ;
 
     switch ( ui->twType->currentIndex() ) {
@@ -206,6 +257,7 @@ void MainWindow::doRemez( void ) {
         weight << 1 << 1 << 1 ;
         break ;
     default :
+        statusBar()->showMessage( "Remez: <not implemented yet>", 2000 ) ;
         return ;
     }
 
@@ -377,7 +429,6 @@ void MainWindow::on_twType_currentChanged( int index ) {
 }
 
 void MainWindow::on_cbFilterType_currentIndexChanged( int index ) {
-    ui->dsbWindowAtten->setEnabled( index <= 2 ) ;
     ui->dsbSubtype->setEnabled( index == 2 || index == 3 ) ;
     switch ( index ) {
     case 2: ui->dsbSubtype->setPrefix( "M: " ) ; break ;
@@ -386,11 +437,40 @@ void MainWindow::on_cbFilterType_currentIndexChanged( int index ) {
     }
 }
 
-void MainWindow::on_pbRemezEstimate_clicked() {
-    // remezord
-    //    dF = fs - fp ;
-    //    Dinf = log10(ds) * ( 5.309e-3 * log10(dp)**2 + 7.114e-2 * log10(dp) + -4.761e-1 ) +
-    //      -2.66e-3 * log10(dp)**2 + -5.941e-1 * log10(dp) + -4.278e-1 ;
-    //    f = 11.01217 + 0.51244 * ( log10(dp) - log10(ds) ) ;
-    //    N1 = Dinf / dF - f * dF + 1 ;
+void MainWindow::on_pbEstimate_clicked() {
+    double tw = ui->dsbTW->value() ;
+    double attn = ui->dsbAtten->value() ;
+    double dp = - attn / 20 ;
+    double ds = - attn / 20 ;
+    int nTaps = 3 ;
+
+    switch ( ui->twMethod->currentIndex() ) {
+    case 0 : {
+            nTaps = ceil( 1 + acosh( 1 / pow( 10.0, dp ) ) / tw / 2 ) ;
+            double beta = cosh( acosh( pow( 10.0, attn / 20.0 ) ) / (nTaps - 1) ) ;
+            qDebug() << nTaps << beta ;
+            ui->dsbChebyBeta->setValue( beta ) ;
+        }
+        break ;
+    case 1 : {
+            double beta = 0.0 ;
+            if ( attn > 50.0 )
+                beta = 0.1102 *( attn - 8.7 ) ;
+            else if ( attn >= 21.0 )
+                beta = 0.5842 * pow( ( attn - 21.0 ), 0.4 ) + 0.07886 * ( attn - 21.0 ) ;
+            ui->dsbKaiserBeta->setValue( beta ) ;
+            nTaps = ceil( ( attn - 8.0 ) / ( 2.285 * tw ) ) ;
+        }
+        break ;
+    case 2 : {
+            double Dinf = ds * ( 5.309e-3 * dp * dp + 7.114e-2 * dp + -4.761e-1 ) +
+                -2.66e-3 * dp * dp + -5.941e-1 * dp + -4.278e-1 ;
+            double f = 11.01217 + 0.51244 * ( dp - ds ) ;
+            nTaps = ceil( Dinf / tw - f * tw + 1 ) ;
+        }
+        break ;
+    default :
+        return ;
+    }
+    ui->dsbNTaps->setValue( nTaps | 1 ) ;
 }

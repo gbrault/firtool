@@ -40,10 +40,11 @@ private slots:
 
     void on_twType_currentChanged(int index);
     void on_cbFilterType_currentIndexChanged(int index);
-
-    void on_pbRemezEstimate_clicked();
+    void on_pbEstimate_clicked();
 
 private:
+    void doCheby();
+    void doKaiser();
     void doWindowed();
     void doRemez();
     void doRRC();

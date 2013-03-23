@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>924</width>
     <height>600</height>
    </rect>
   </property>
@@ -358,6 +358,16 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="tsbDifferentiator">
+          <attribute name="title">
+           <string>Differentiator</string>
+          </attribute>
+         </widget>
+         <widget class="QWidget" name="tsbHilbert">
+          <attribute name="title">
+           <string>Hilbert</string>
+          </attribute>
+         </widget>
         </widget>
        </widget>
        <widget class="QTabWidget" name="twMethod">
@@ -377,17 +387,17 @@
          <enum>QTabWidget::Triangular</enum>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
-        <widget class="QWidget" name="tab_2">
+        <widget class="QWidget" name="tsbChebyshev">
          <attribute name="title">
-          <string>Windowed</string>
+          <string>Chebyshev</string>
          </attribute>
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="1" column="3">
-           <widget class="QDoubleSpinBox" name="dsbWindowAtten">
+         <layout class="QGridLayout" name="gridLayout_11">
+          <item row="0" column="0">
+           <widget class="QDoubleSpinBox" name="dsbChebyBeta">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -399,19 +409,106 @@
              </size>
             </property>
             <property name="prefix">
-             <string>Attenuation: </string>
-            </property>
-            <property name="suffix">
-             <string> dB</string>
+             <string>beta: </string>
             </property>
             <property name="decimals">
-             <number>0</number>
+             <number>8</number>
             </property>
             <property name="maximum">
              <double>999.000000000000000</double>
             </property>
+            <property name="singleStep">
+             <double>0.000000000000000</double>
+            </property>
             <property name="value">
-             <double>100.000000000000000</double>
+             <double>4.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <spacer name="horizontalSpacer_10">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tsbKaiser">
+         <attribute name="title">
+          <string>Kaiser</string>
+         </attribute>
+         <layout class="QGridLayout" name="gridLayout_10">
+          <item row="0" column="0">
+           <widget class="QDoubleSpinBox" name="dsbKaiserBeta">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>200</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="prefix">
+             <string>beta: </string>
+            </property>
+            <property name="decimals">
+             <number>8</number>
+            </property>
+            <property name="value">
+             <double>4.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab">
+         <attribute name="title">
+          <string>Remez</string>
+         </attribute>
+         <layout class="QGridLayout" name="gridLayout_2"/>
+        </widget>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>Windowed</string>
+         </attribute>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QComboBox" name="cbFilterType">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
             </property>
            </widget>
           </item>
@@ -440,23 +537,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QComboBox" name="cbFilterType">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>150</width>
-              <height>0</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="4">
+          <item row="0" column="3">
            <spacer name="horizontalSpacer_5">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -468,99 +549,6 @@
              </size>
             </property>
            </spacer>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tab">
-         <attribute name="title">
-          <string>Remez</string>
-         </attribute>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="3" column="3">
-           <spacer name="horizontalSpacer_6">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="3" column="1">
-           <widget class="QDoubleSpinBox" name="dsbRemezTW">
-            <property name="minimumSize">
-             <size>
-              <width>200</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="prefix">
-             <string>Transistion width: </string>
-            </property>
-            <property name="suffix">
-             <string> Hz</string>
-            </property>
-            <property name="maximum">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.010000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="cbRemezType"/>
-          </item>
-          <item row="1" column="3">
-           <spacer name="horizontalSpacer_10">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="3" column="4">
-           <widget class="QDoubleSpinBox" name="dsbRemezAttn">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>200</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="prefix">
-             <string>Attenuation: </string>
-            </property>
-            <property name="suffix">
-             <string> dB</string>
-            </property>
-            <property name="maximum">
-             <double>1000.000000000000000</double>
-            </property>
-            <property name="value">
-             <double>100.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="4">
-           <widget class="QPushButton" name="pbRemezEstimate">
-            <property name="text">
-             <string>Estimate</string>
-            </property>
-           </widget>
           </item>
          </layout>
         </widget>
@@ -663,7 +651,7 @@
              <string>Samples Per Symbol: </string>
             </property>
             <property name="decimals">
-             <number>0</number>
+             <number>3</number>
             </property>
             <property name="maximum">
              <double>99.000000000000000</double>
@@ -854,12 +842,56 @@
         </widget>
        </widget>
       </widget>
-      <widget class="QWidget" name="horizontalLayoutWidget">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <property name="sizeConstraint">
-         <enum>QLayout::SetFixedSize</enum>
-        </property>
-        <item>
+      <widget class="QGroupBox" name="gbParams">
+       <property name="title">
+        <string> Parameters </string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_9">
+        <item row="0" column="3">
+         <widget class="QPushButton" name="pbEstimate">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>120</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Estimate</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QDoubleSpinBox" name="dsbTW">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="prefix">
+           <string>Transistion width: </string>
+          </property>
+          <property name="suffix">
+           <string> Hz</string>
+          </property>
+          <property name="maximum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.050000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
          <widget class="QDoubleSpinBox" name="dsbNTaps">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -890,7 +922,7 @@
           </property>
          </widget>
         </item>
-        <item>
+        <item row="0" column="1">
          <widget class="QDoubleSpinBox" name="dsbNBits">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -918,7 +950,38 @@
           </property>
          </widget>
         </item>
-        <item>
+        <item row="0" column="4">
+         <widget class="QDoubleSpinBox" name="dsbAtten">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="prefix">
+           <string>Attenuation: </string>
+          </property>
+          <property name="suffix">
+           <string> dB</string>
+          </property>
+          <property name="decimals">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <double>999.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>100.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
          <spacer name="horizontalSpacer_9">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -942,7 +1005,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>924</width>
      <height>21</height>
     </rect>
    </property>
