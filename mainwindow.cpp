@@ -429,10 +429,10 @@ void MainWindow::on_twType_currentChanged( int index ) {
 }
 
 void MainWindow::on_cbFilterType_currentIndexChanged( int index ) {
-    ui->dsbSubtype->setEnabled( index == 2 || index == 3 ) ;
+    ui->dsbSubtype->setEnabled( index == 0 || index == 1 ) ;
     switch ( index ) {
-    case 2: ui->dsbSubtype->setPrefix( "M: " ) ; break ;
-    case 3: ui->dsbSubtype->setPrefix( "Type: " ) ; break ;
+    case 0: ui->dsbSubtype->setPrefix( "M: " ) ; break ;
+    case 1: ui->dsbSubtype->setPrefix( "Type: " ) ; break ;
     default: ui->dsbSubtype->setPrefix( "<not used> " ) ; break ;
     }
 }
@@ -448,7 +448,6 @@ void MainWindow::on_pbEstimate_clicked() {
     case 0 : {
             nTaps = ceil( 1 + acosh( 1 / pow( 10.0, dp ) ) / tw / 2 ) ;
             double beta = cosh( acosh( pow( 10.0, attn / 20.0 ) ) / (nTaps - 1) ) ;
-            qDebug() << nTaps << beta ;
             ui->dsbChebyBeta->setValue( beta ) ;
         }
         break ;
@@ -462,6 +461,7 @@ void MainWindow::on_pbEstimate_clicked() {
             nTaps = ceil( ( attn - 8.0 ) / ( 2.285 * tw ) ) ;
         }
         break ;
+    default :
     case 2 : {
             double Dinf = ds * ( 5.309e-3 * dp * dp + 7.114e-2 * dp + -4.761e-1 ) +
                 -2.66e-3 * dp * dp + -5.941e-1 * dp + -4.278e-1 ;
@@ -469,8 +469,8 @@ void MainWindow::on_pbEstimate_clicked() {
             nTaps = ceil( Dinf / tw - f * tw + 1 ) ;
         }
         break ;
-    default :
-        return ;
+//    default :
+//        return ;
     }
     ui->dsbNTaps->setValue( nTaps | 1 ) ;
 }
