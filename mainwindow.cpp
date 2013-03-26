@@ -99,8 +99,10 @@ void MainWindow::on_actionDesign_triggered() {
     Window.clear() ;
     Coefs.clear() ;
 
-    nTaps = (int)ui->dsbNTaps->value() | 1 ;
-    ui->dsbNTaps->setValue( nTaps ) ;
+//    if ( ui->twType->currentIndex() < 4 ) {
+        nTaps = (int)ui->dsbNTaps->value() | 1 ;
+        ui->dsbNTaps->setValue( nTaps ) ;
+//    }
 
     switch ( ui->twMethod->currentIndex() ) {
     case 0 : doCheby() ; break ;
@@ -137,6 +139,8 @@ void MainWindow::doCheby( void ) {
     case 3 :
         bandStop( T.data(), ui->dsbBSStop->value(), ui->dsbBSStart->value(), W.data(), nTaps ) ;
         break ;
+    default :
+        statusBar()->showMessage( "Chebyshev: <not implemented yet>", 2000 ) ;
     }
     Coefs = T ;
 }
@@ -165,6 +169,8 @@ void MainWindow::doKaiser( void ) {
     case 3 :
         bandStop( T.data(), ui->dsbBSStop->value(), ui->dsbBSStart->value(), W.data(), nTaps ) ;
         break ;
+    default :
+        statusBar()->showMessage( "Kaiser: <not implemented yet>", 2000 ) ;
     }
     Coefs = T ;
 }
@@ -211,6 +217,8 @@ void MainWindow::doWindowed( void ) {
     case 3 :
         bandStop( T.data(), ui->dsbBSStop->value(), ui->dsbBSStart->value(), W.data(), nTaps ) ;
         break ;
+    default :
+        statusBar()->showMessage( "Windowed: <not implemented yet>", 2000 ) ;
     }
     Coefs = T ;
 }
@@ -220,10 +228,12 @@ void MainWindow::doRemez( void ) {
     QVector<double> bands ;
     QVector<double> response ;
     QVector<double> weight ;
+    double slope ;
     int nbands = 0 ;
 
     double tw = ui->dsbTW->value() / 2.0 ;
     double tf, tfl, tfr ;
+    REMEZ_t type = BANDPASS ;
 
     switch ( ui->twType->currentIndex() ) {
     case 0 :
@@ -232,6 +242,7 @@ void MainWindow::doRemez( void ) {
         bands << 0.0 << tf-tw << tf+tw << 0.5 ;
         response << 1 << 1 << 0 << 0 ;
         weight << 1 << 1 ;
+        type = BANDPASS ;
         break ;
     case 1 :
         nbands = 2 ;
@@ -239,6 +250,7 @@ void MainWindow::doRemez( void ) {
         bands << 0.0 << tf-tw << tf+tw << 0.5 ;
         response << 0 << 0 << 1 << 1 ;
         weight << 1 << 1 ;
+        type = BANDPASS ;
         break ;
     case 2 :
         nbands = 3 ;
@@ -247,6 +259,7 @@ void MainWindow::doRemez( void ) {
         bands << 0.0 << tfl-tw << tfl+tw << tfr-tw << tfr+tw << 0.5 ;
         response << 0 << 0 << 1 << 1 << 0 << 0 ;
         weight << 1 << 1 << 1 ;
+        type = BANDPASS ;
         break ;
     case 3 :
         nbands = 3 ;
@@ -255,13 +268,33 @@ void MainWindow::doRemez( void ) {
         bands << 0.0 << tfl-tw << tfl+tw << tfr-tw << tfr+tw << 0.5 ;
         response << 1 << 1 << 0 << 0 << 1 << 1 ;
         weight << 1 << 1 << 1 ;
+        type = BANDPASS ;
+        break ;
+    case 4 :
+        nbands = 1 ;
+        tfl = ui->dsbDiffLowerBandEdge->value() ;
+        tfr = ui->dsbDiffUpperBandEdge->value() ;
+        slope = ui->dsbDiffDesiredSlope->value() ;
+        bands << tfl << tfr ;
+        response << 0 << 1 << 0 ;
+        weight << 1 << 1 ;
+        type = DIFFERENTIATOR ;
+        break ;
+    case 5 :
+        nbands = 1 ;
+        tfl = ui->dsbHilbertStart->value() ;
+        tfr = ui->dsbHilbertStop->value() ;
+        bands << tfl << tfr ;
+        response << 1 ;
+        weight << 1 ;
+        type = HILBERT ;
         break ;
     default :
         statusBar()->showMessage( "Remez: <not implemented yet>", 2000 ) ;
         return ;
     }
 
-    int err = remez( T.data(), nTaps, nbands, bands.data(), response.data(), weight.data(), BANDPASS, 64 ) ;
+    int err = remez( T.data(), nTaps, nbands, bands.data(), response.data(), weight.data(), type, 64 ) ;
 
     switch ( err ) {
     case -1 :
@@ -327,7 +360,7 @@ void MainWindow::doShow( void ) {
     freqChar( Coefs.data(), F.data(), nTaps, FFTLEN ) ;
 
     QVector<double> M( FFTLEN ) ;
-    magnitude( F.data(), M.data(), FFTLEN ) ;
+    magnitude( F.data(), M.data(), FFTLEN, ui->cbLog->isChecked() ) ;
     QVector<double> P( FFTLEN ) ;
     phase( F.data(), P.data(), FFTLEN ) ;
     QVector<double> D( FFTLEN ) ;
@@ -339,8 +372,11 @@ void MainWindow::doShow( void ) {
 
     customPlotFreq->graph(0)->rescaleKeyAxis();
 
-    QCPRange newRange( -200, 0 ) ;
-    customPlotFreq->yAxis->setRange( newRange ) ;
+    if ( ui->cbLog->isChecked() )
+        customPlotFreq->yAxis->setRange( QCPRange( -200, 10 ) ) ;
+    else
+        customPlotFreq->yAxis->setRange( QCPRange( -0.2, 1.2 ) ) ;
+
 
 //    customPlotFreq->graph(0)->rescaleValueAxis();
 //    customPlotFreq->graph(1)->rescaleValueAxis();
@@ -422,19 +458,31 @@ void MainWindow::on_actionAbout_triggered() {
 void MainWindow::closeEvent( QCloseEvent *event ) {
 //    writeSettings() ;
     event->accept() ;
- }
-
-void MainWindow::on_twType_currentChanged( int index ) {
-    ui->cbFilterType->setEnabled( index < 4 ) ;
 }
 
+void MainWindow::doUIenables( void ) {
+    ui->actionDesign->setEnabled( ui->twType->currentIndex() < 4 || ui->twMethod->currentIndex() == 2 ) ;
+}
+
+void MainWindow::on_twType_currentChanged( int index ) {
+    (void)index;
+    doUIenables();
+}
+
+void MainWindow::on_twMethod_currentChanged( int index ) {
+    (void)index;
+    doUIenables();
+}
+
+
 void MainWindow::on_cbFilterType_currentIndexChanged( int index ) {
-    ui->dsbSubtype->setEnabled( index == 0 || index == 1 ) ;
-    switch ( index ) {
-    case 0: ui->dsbSubtype->setPrefix( "M: " ) ; break ;
-    case 1: ui->dsbSubtype->setPrefix( "Type: " ) ; break ;
-    default: ui->dsbSubtype->setPrefix( "<not used> " ) ; break ;
-    }
+    (void)index;
+//    ui->dsbSubtype->setEnabled( index == 0 || index == 1 ) ;
+//    switch ( index ) {
+//    case 0: ui->dsbSubtype->setPrefix( "M: " ) ; break ;
+//    case 1: ui->dsbSubtype->setPrefix( "Type: " ) ; break ;
+//    default: ui->dsbSubtype->setPrefix( "<not used> " ) ; break ;
+//    }
 }
 
 void MainWindow::on_pbEstimate_clicked() {
@@ -474,3 +522,4 @@ void MainWindow::on_pbEstimate_clicked() {
     }
     ui->dsbNTaps->setValue( nTaps | 1 ) ;
 }
+

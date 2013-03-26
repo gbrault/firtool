@@ -75,27 +75,27 @@ static void CreateDenseGrid(
     double Grid[], double D[], double W[],
     int symmetry, int griddensity
 ) {
-   double delf = 0.5/( griddensity * r ) ;
+   double delf = 0.5 / ( griddensity * r ) ;
 
 /*
  * For differentiator, hilbert,
  *   symmetry is odd and Grid[0] = max(delf, bands[0])
  */
-   double grid0 = (symmetry == NEGATIVE) && (delf > bands[0]) ? delf : bands[0];
+   double grid0 = ( symmetry == NEGATIVE ) && ( delf > bands[ 0 ] ) ? delf : bands[ 0 ] ;
 
    int j = 0 ;
    for ( int band=0; band < numband; band++ ) {
-      double lowf = (band==0 ? grid0 : bands[2*band]);
-      double highf = bands[2*band + 1];
+      double lowf = ( band == 0 ? grid0 : bands[ 2 * band ] ) ;
+      double highf = bands[ 2 * band + 1 ] ;
       int k = (int)((highf - lowf)/delf + 0.5);   /* .5 for rounding */
-      for (int i=0; i<k; i++) {
-         D[j] = des[2*band] + i*(des[2*band+1]-des[2*band])/(k-1);
-         W[j] = weight[band];
-         Grid[j] = lowf;
-         lowf += delf;
-         j++;
+      for ( int i = 0 ; i < k ; i++ ) {
+         D[ j ] = des[ 2 * band ] + i * ( des[ 2 * band + 1 ] - des[ 2 * band ] ) / ( k - 1 ) ;
+         W[ j ] = weight[ band ] ;
+         Grid[ j ] = lowf ;
+         lowf += delf ;
+         j++ ;
       }
-      Grid[j-1] = highf;
+      Grid[ j - 1 ] = highf ;
    }
 
 /*
@@ -174,7 +174,7 @@ static void CalcParms(int r, int Ext[], double Grid[], double D[], double W[],
              if ( k != i )
                 denom *= 2.0*( xi - x[ k ] ) ;
        }
-       if ( fabs( denom )<0.00001 )
+       if ( fabs( denom ) < 0.00001 )
           denom = 0.00001 ;
        ad[ i ] = 1.0 / denom ;
    }
@@ -186,8 +186,8 @@ static void CalcParms(int r, int Ext[], double Grid[], double D[], double W[],
    double numer = 0.0 ;
    double sign = 1 ;
    for ( int i = 0 ; i <= r ; i++ ) {
-      numer += ad[ i ] * D[ Ext[ i ] ];
-      denom += sign * ad[ i ] / W[ Ext[ i ] ];
+      numer += ad[ i ] * D[ Ext[ i ] ] ;
+      denom += sign * ad[ i ] / W[ Ext[ i ] ] ;
       sign = -sign ;
    }
    double delta = numer / denom ;
@@ -196,7 +196,7 @@ static void CalcParms(int r, int Ext[], double Grid[], double D[], double W[],
 /*
  * Calculate y[]  - Oppenheim & Schafer eq 7.133b
  */
-   for ( int i = 0 ; i <=r ; i++ ) {
+   for ( int i = 0 ; i <= r ; i++ ) {
       y[i] = D[ Ext[ i ] ] - sign * delta / W[ Ext[ i ] ] ;
       sign = -sign ;
    }
@@ -228,11 +228,11 @@ static double ComputeA(double freq, int r, double ad[], double x[], double y[]) 
    double denom = 0.0 ;
    double numer = 0.0 ;
    double xc = cos( M_PI * 2.0 * freq ) ;
-   for (int i=0; i<=r; i++) {
-      double c = xc - x[i];
+   for ( int i = 0 ; i <= r ; i++ ) {
+      double c = xc - x[ i ] ;
       if ( fabs(c) < 1.0e-7 ) {
-         numer = y[i];
-         denom = 1;
+         numer = y[ i ] ;
+         denom = 1 ;
          break;
       }
       c = ad[i] / c ;
@@ -427,41 +427,48 @@ static void FreqSample( int N, double A[], long double h[], int symm ) {
    double M = ( N - 1.0 ) / 2.0 ;
    if ( symm == POSITIVE ) {
       if ( N%2 ) {
-         for ( int n=0; n<N; n++ ) {
-            double val = A[0];
-            double x = M_PI * 2.0 * (n - M)/N;
-            for (int k=1; k<=M; k++)
-               val += 2.0 * A[k] * cos(x*k);
+         for ( int n = 0 ; n < N ; n++ ) {
+            long double val = A[ 0 ] ;
+            double x = M_PI * 2.0 * ( n - M ) / N ;
+            for ( int k = 1 ; k <= M ; k++ )
+               val += 2.0 * A[ k ] * cos( x * k ) ;
             h[n] = val/N;
          }
       } else {
-         for ( int n=0; n<N; n++ ) {
-            double val = A[0];
-            double x = M_PI * 2.0 * (n - M)/N;
-            for (int k=1; k<=(N/2-1); k++)
-               val += 2.0 * A[k] * cos(x*k);
+         for ( int n = 0 ; n < N ; n++ ) {
+            long double val = A[ 0 ] ;
+            double x = M_PI * 2.0 * ( n - M ) / N ;
+            for ( int k = 1 ; k<=( N / 2 - 1 ) ; k++ )
+               val += 2.0 * A[ k ] * cos( x * k ) ;
             h[n] = val/N;
          }
       }
    } else {
       if (N%2) {
-         for ( int n=0; n<N; n++ ) {
-            double val = 0;
-            double x = M_PI * 2.0 * (n - M)/N;
-            for (int k=1; k<=M; k++)
-               val += 2.0 * A[k] * sin(x*k);
-            h[n] = val/N;
+         for ( int n = 0 ; n < N ; n++ ) {
+            long double val = 0 ;
+            double x = M_PI * 2.0 * ( n - M ) / N ;
+            for ( int k = 1 ; k <= M ; k++ )
+               val += 2.0 * A[ k ] * sin( x * k ) ;
+            h[n] = val / N ;
          }
       } else {
-          for ( int n=0; n<N; n++ ) {
-             double val = A[N/2] * sin(M_PI * (n - M));
-             double x = M_PI * 2.0 * (n - M)/N;
-             for (int k=1; k<=(N/2-1); k++)
-                val += 2.0 * A[k] * sin(x*k);
-             h[n] = val/N;
+          for ( int n = 0 ; n < N ; n++ ) {
+             long double val = A[ N / 2 ] * sin( M_PI * ( n - M ) ) ;
+             double x = M_PI * 2.0 * ( n - M ) / N ;
+             for ( int k = 1 ; k <= ( N / 2 - 1 ) ; k++ )
+                val += 2.0 * A[ k ] * sin( x * k ) ;
+             h[n] = val / N ;
           }
       }
    }
+
+   long double max = 0.0L ;
+   for ( int n = 0 ; n < N ; n++ )
+       if ( max < fabs( h[ n ] ) )
+            max = fabs( h[ n ] ) ;
+   for ( int n = 0 ; max > 0.0L && n < N ; n++ )
+       h[ n ] /= max * 2.0L ;
 }
 
 /*******************
@@ -487,7 +494,7 @@ static int isDone( int r, int Ext[], double E[] ) {
 
    min = max = fabs( E[ Ext[0] ] ) ;
    for (int i = 1 ; i <= r ; i++ ) {
-      double current = fabs( E[ Ext[i] ] ) ;
+      double current = fabs( E[ Ext[ i ] ] ) ;
       if ( current < min )
          min = current ;
       if ( current > max)
@@ -526,9 +533,9 @@ int remez( long double h[], int numtaps, int numband, const double bands[],
    int symmetry = POSITIVE ;
 
    if ( type == BANDPASS )
-      symmetry = POSITIVE;
+      symmetry = POSITIVE ;
    else
-      symmetry = NEGATIVE;
+      symmetry = NEGATIVE ;
 
    int r = numtaps / 2 ;                  /* number of extrema */
    if ( ( numtaps % 2 ) && ( symmetry == POSITIVE ) )
@@ -540,7 +547,7 @@ int remez( long double h[], int numtaps, int numband, const double bands[],
  */
    int gridsize = 0 ;
    for ( int i = 0 ; i < numband ; i++ )
-      gridsize += (int)( 2.0 * r * griddensity * ( bands[2*i+1] - bands[2*i] ) + 0.5 ) ;
+      gridsize += (int)( 2.0 * r * griddensity * ( bands[ 2 * i + 1 ] - bands[ 2 * i ] ) + 0.5 ) ;
    if ( symmetry == NEGATIVE )
       gridsize-- ;
 
@@ -580,8 +587,8 @@ int remez( long double h[], int numtaps, int numband, const double bands[],
  * For odd or Negative symmetry filters, alter the
  * D[] and W[] according to Parks McClellan
  */
-   if (symmetry == POSITIVE) {
-      if (numtaps % 2 == 0) {
+   if ( symmetry == POSITIVE ) {
+      if ( numtaps % 2 == 0 ) {
          for (int i = 0 ; i < gridsize ; i++) {
             c = cos( M_PI * Grid[i] ) ;
             D[i] /= c ;
@@ -589,16 +596,14 @@ int remez( long double h[], int numtaps, int numband, const double bands[],
          }
       }
    } else {
-      if (numtaps % 2) {
-         for ( int i=0; i < gridsize ; i++ )
-         {
+      if ( numtaps % 2 ) {
+         for ( int i = 0 ; i < gridsize ; i++ ) {
             c = sin( M_PI * 2.0 * Grid[i] ) ;
             D[i] /= c ;
             W[i] *= c ;
          }
       } else {
-         for ( int i = 0 ; i < gridsize ; i++ )
-         {
+         for ( int i = 0 ; i < gridsize ; i++ ) {
             c = sin( M_PI * Grid[i] ) ;
             D[i] /= c ;
             W[i] *= c ;
@@ -609,7 +614,7 @@ int remez( long double h[], int numtaps, int numband, const double bands[],
 /*
  * Perform the Remez Exchange algorithm
  */
-   for ( iter=0 ; iter<MAXITERATIONS ; iter++ ) {
+   for ( iter = 0 ; iter < MAXITERATIONS ; iter++ ) {
       CalcParms( r, Ext, Grid, D, W, ad, x, y ) ;
       CalcError( r, ad, x, y, gridsize, Grid, D, W, E ) ;
       int err = Search( r, Ext, gridsize, E ) ;
@@ -633,7 +638,7 @@ int remez( long double h[], int numtaps, int numband, const double bands[],
          if ( numtaps % 2 )
             c = 1.0 ;
          else
-            c = cos( M_PI * (double)i / numtaps );
+            c = cos( M_PI * (double)i / numtaps ) ;
       } else {
          if ( numtaps % 2 )
             c = sin( M_PI * 2.0 * (double)i / numtaps ) ;

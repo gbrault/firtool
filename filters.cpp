@@ -64,6 +64,22 @@ void bandStop( long double * T, double stop_freq, double start_freq, long double
         T[ i ] /= scale ;
 }
 
+void differentiator( long double * T, double stop_freq, double start_freq, long double * W, int aLen ) {
+    int M = ( aLen - 1 ) / 2 ;
+    long double fwT0 = 2.0L * M_PI * stop_freq ;
+    long double fwT1 = 2.0L * M_PI * start_freq ;
+
+    for ( int n = -M ; n <= M ; n++ )
+        if ( n == 0 )
+            T[ n + M ] = 1.0L - ( fwT1 - fwT0 ) * W[ n + M ] / M_PI ;
+        else
+            T[ n + M ] = ( sin( n * fwT0 ) - sin( n * fwT1 ) ) * W[ n + M ] / ( n * M_PI ) ;
+
+    long double scale = 2.0L * fabsl( T[ 0 + M ] ) ;
+    for( int i = 0 ; i < aLen ; i++ )
+        T[ i ] /= scale ;
+}
+
 void gaussian( long double * T, double spb, double bt, int aLen ) {
     long double dt = 1.0L / spb ;
     long double s = 1.0 / ( sqrtl( logl( 2.0L ) ) / ( 2.0L * (long double)M_PI * bt ) ) ;
