@@ -45,11 +45,11 @@ FORMS    += mainwindow.ui
 RESOURCES += \
     firtool.qrc
 
-win32: {
+win32 : {
     OTHER_FILES += firtool.rc
     RC_FILE = firtool.rc
 }
-macx: {
+macx : {
     ICON = toolbox.ico
 }
 

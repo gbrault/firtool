@@ -42,6 +42,8 @@ private slots:
     void on_cbFilterType_currentIndexChanged(int index);
     void on_pbEstimate_clicked();
 
+    void on_twMethod_currentChanged(int index);
+
 private:
     void doCheby();
     void doKaiser();
@@ -51,6 +53,7 @@ private:
     void doGauss();
 
     void doShow();
+    void doUIenables();
 
     Ui::MainWindow *ui;
     QCustomPlot * customPlotFreq ;
