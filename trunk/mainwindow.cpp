@@ -428,10 +428,10 @@ void MainWindow::on_actionSave_Coefs_triggered() {
     } else
     if ( fileName.endsWith( ".h", Qt::CaseInsensitive ) ) {
         stream << "//\n// Created by FIRTool at: " << date.toString("MMMM d yyyy") << "\n// c 2013 www.mediatronix.com\n//\n" ;
-        stream << "double coefdata[] = (\n" ;
+        stream << "double coefdata[] = {\n" ;
         for ( int i = 0 ; i < Coefs.size() - 1 ; i += 1 )
             stream << QString("    %1").arg( Coefs[ i ], 0, 'g', 9 ) << ",\n" ;
-        stream << QString("    %1").arg( Coefs[ Coefs.size() - 1 ], 0, 'g', 9 ) << "\n) ;\n" ;
+        stream << QString("    %1").arg( Coefs[ Coefs.size() - 1 ], 0, 'g', 9 ) << "\n} ;\n" ;
     } else
     if ( fileName.endsWith( ".vhd", Qt::CaseInsensitive ) ) {
         double range = pow( 2, ui->dsbNBits->value() ) - 1 ;
