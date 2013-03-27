@@ -225,9 +225,9 @@ void MainWindow::doWindowed( void ) {
 
 void MainWindow::doRemez( void ) {
     QVector<long double> T( nTaps ) ;
-    QVector<double> bands ;
-    QVector<double> response ;
-    QVector<double> weight ;
+    QVector<long double> bands ;
+    QVector<long double> response ;
+    QVector<long double> weight ;
     double slope ;
     int nbands = 0 ;
 
