@@ -70,23 +70,23 @@ const int MAXITERATIONS = 40 ;
  *******************/
 
 static void CreateDenseGrid(
-    int r, int numtaps, int numband, const double bands[],
-    const double des[], const double weight[], int gridsize,
-    double Grid[], double D[], double W[],
+    int r, int numtaps, int numband, const ld_t bands[],
+    const ld_t des[], const ld_t weight[], int gridsize,
+    ld_t Grid[], ld_t D[], ld_t W[],
     int symmetry, int griddensity
 ) {
-   double delf = 0.5 / ( griddensity * r ) ;
+   ld_t delf = 0.5L / ( griddensity * r ) ;
 
 /*
  * For differentiator, hilbert,
  *   symmetry is odd and Grid[0] = max(delf, bands[0])
  */
-   double grid0 = ( symmetry == NEGATIVE ) && ( delf > bands[ 0 ] ) ? delf : bands[ 0 ] ;
+   ld_t grid0 = ( symmetry == NEGATIVE ) && ( delf > bands[ 0 ] ) ? delf : bands[ 0 ] ;
 
    int j = 0 ;
    for ( int band=0; band < numband; band++ ) {
-      double lowf = ( band == 0 ? grid0 : bands[ 2 * band ] ) ;
-      double highf = bands[ 2 * band + 1 ] ;
+      ld_t lowf = ( band == 0 ? grid0 : bands[ 2 * band ] ) ;
+      ld_t highf = bands[ 2 * band + 1 ] ;
       int k = (int)((highf - lowf)/delf + 0.5);   /* .5 for rounding */
       for ( int i = 0 ; i < k ; i++ ) {
          D[ j ] = des[ 2 * band ] + i * ( des[ 2 * band + 1 ] - des[ 2 * band ] ) / ( k - 1 ) ;
@@ -153,9 +153,10 @@ static void InitialGuess( int r, int Ext[], int gridsize ) {
  * double y[]    - 'C' in Oppenheim & Schafer [r+1]
  ***********************/
 
-static void CalcParms(int r, int Ext[], double Grid[], double D[], double W[],
-                double ad[], double x[], double y[]) {
-
+static void CalcParms(
+    int r, int Ext[], ld_t Grid[], ld_t D[], ld_t W[],
+    ld_t ad[], ld_t x[], ld_t y[]
+) {
 /*
  * Find x[]
  */
@@ -174,8 +175,8 @@ static void CalcParms(int r, int Ext[], double Grid[], double D[], double W[],
              if ( k != i )
                 denom *= 2.0*( xi - x[ k ] ) ;
        }
-       if ( fabs( denom ) < 0.00001 )
-          denom = 0.00001 ;
+       if ( fabs( denom ) < 1e-12 )
+          denom = 1e-12 ;
        ad[ i ] = 1.0 / denom ;
    }
 
@@ -224,7 +225,7 @@ static void CalcParms(int r, int Ext[], double Grid[], double D[], double W[],
  * Returns double value of A[freq]
  *********************/
 
-static double ComputeA(double freq, int r, double ad[], double x[], double y[]) {
+static double ComputeA(ld_t freq, int r, ld_t ad[], ld_t x[], ld_t y[]) {
    double denom = 0.0 ;
    double numer = 0.0 ;
    double xc = cos( M_PI * 2.0 * freq ) ;
@@ -267,12 +268,12 @@ static double ComputeA(double freq, int r, double ad[], double x[], double y[]) 
  * double E[]    - Error function on dense grid [gridsize]
  ************************/
 
-static void CalcError(int r, double ad[], double x[], double y[],
-               int gridsize, double Grid[],
-               double D[], double W[], double E[]) {
-   for ( int i=0; i<gridsize; i++ ) {
-      double A = ComputeA(Grid[i], r, ad, x, y);
-      E[i] = W[i] * (D[i] - A);
+static void CalcError(int r, ld_t ad[], ld_t x[], ld_t y[],
+               int gridsize, ld_t Grid[],
+               ld_t D[], ld_t W[], ld_t E[]) {
+   for ( int i = 0 ; i < gridsize ; i++ ) {
+      ld_t A = ComputeA( Grid[ i ], r, ad, x, y);
+      E[ i ] = W[ i ] * ( D[ i ] - A );
    }
 }
 
@@ -300,7 +301,7 @@ static void CalcError(int r, double ad[], double x[], double y[],
  * -------
  * int    Ext[]    - New indexes to extremal frequencies [r+1]
  ************************/
-static int Search(int r, int Ext[], int gridsize, double E[]) {
+static int Search( int r, int Ext[], int gridsize, ld_t E[] ) {
 /*
  * Allocate enough space for found extremals.
  */
@@ -423,12 +424,12 @@ static int Search(int r, int Ext[], int gridsize, double E[]) {
  * -------
  * double h[] - Impulse Response of final filter [N]
  *********************/
-static void FreqSample( int N, double A[], long double h[], int symm ) {
+static void FreqSample( int N, ld_t A[], ld_t h[], int symm ) {
    double M = ( N - 1.0 ) / 2.0 ;
    if ( symm == POSITIVE ) {
       if ( N%2 ) {
          for ( int n = 0 ; n < N ; n++ ) {
-            long double val = A[ 0 ] ;
+            ld_t val = A[ 0 ] ;
             double x = M_PI * 2.0 * ( n - M ) / N ;
             for ( int k = 1 ; k <= M ; k++ )
                val += 2.0 * A[ k ] * cos( x * k ) ;
@@ -436,7 +437,7 @@ static void FreqSample( int N, double A[], long double h[], int symm ) {
          }
       } else {
          for ( int n = 0 ; n < N ; n++ ) {
-            long double val = A[ 0 ] ;
+            ld_t val = A[ 0 ] ;
             double x = M_PI * 2.0 * ( n - M ) / N ;
             for ( int k = 1 ; k<=( N / 2 - 1 ) ; k++ )
                val += 2.0 * A[ k ] * cos( x * k ) ;
@@ -446,7 +447,7 @@ static void FreqSample( int N, double A[], long double h[], int symm ) {
    } else {
       if (N%2) {
          for ( int n = 0 ; n < N ; n++ ) {
-            long double val = 0 ;
+            ld_t val = 0 ;
             double x = M_PI * 2.0 * ( n - M ) / N ;
             for ( int k = 1 ; k <= M ; k++ )
                val += 2.0 * A[ k ] * sin( x * k ) ;
@@ -454,7 +455,7 @@ static void FreqSample( int N, double A[], long double h[], int symm ) {
          }
       } else {
           for ( int n = 0 ; n < N ; n++ ) {
-             long double val = A[ N / 2 ] * sin( M_PI * ( n - M ) ) ;
+             ld_t val = A[ N / 2 ] * sin( M_PI * ( n - M ) ) ;
              double x = M_PI * 2.0 * ( n - M ) / N ;
              for ( int k = 1 ; k <= ( N / 2 - 1 ) ; k++ )
                 val += 2.0 * A[ k ] * sin( x * k ) ;
@@ -463,7 +464,7 @@ static void FreqSample( int N, double A[], long double h[], int symm ) {
       }
    }
 
-   long double max = 0.0L ;
+   ld_t max = 0.0L ;
    for ( int n = 0 ; n < N ; n++ )
        if ( max < fabs( h[ n ] ) )
             max = fabs( h[ n ] ) ;
@@ -489,7 +490,7 @@ static void FreqSample( int N, double A[], long double h[], int symm ) {
  * Returns 0 if the result has not converged
  ********************/
 
-static int isDone( int r, int Ext[], double E[] ) {
+static int isDone( int r, int Ext[], ld_t E[] ) {
    double min, max ;
 
    min = max = fabs( E[ Ext[0] ] ) ;
@@ -500,7 +501,7 @@ static int isDone( int r, int Ext[], double E[] ) {
       if ( current > max)
          max = current ;
    }
-   return ( ( ( max - min ) / max ) < 0.0001 ) ;
+   return ( ( ( max - min ) / max ) < 1e-12 ) ;
 }
 
 /********************
@@ -526,10 +527,9 @@ static int isDone( int r, int Ext[], double E[] ) {
  * returns         - true on success, false on failure to converge
  ********************/
 
-int remez( long double h[], int numtaps, int numband, const double bands[],
-      const double des[], const double weight[], REMEZ_t type, int griddensity ) {
-   int iter ;
-   double c ;
+int remez( ld_t h[], int numtaps, int numband, const ld_t bands[],
+      const ld_t des[], const ld_t weight[], REMEZ_t type, int griddensity
+) {
    int symmetry = POSITIVE ;
 
    if ( type == BANDPASS )
@@ -554,16 +554,16 @@ int remez( long double h[], int numtaps, int numband, const double bands[],
 /*
  * Dynamically allocate memory for arrays with proper sizes
  */
-   double Grid[ gridsize ] ;
-   double D[ gridsize ] ;
-   double W[ gridsize ] ;
-   double E[ gridsize ] ;
+   ld_t Grid[ gridsize ] ;
+   ld_t D[ gridsize ] ;
+   ld_t W[ gridsize ] ;
+   ld_t E[ gridsize ] ;
 
    int Ext[ r + 1 ] ;
-   double taps[ r + 1 ] ;
-   double x[ r + 1 ] ;
-   double y[ r + 1 ] ;
-   double ad[ r + 1 ] ;
+   ld_t taps[ r + 1 ] ;
+   ld_t x[ r + 1 ] ;
+   ld_t y[ r + 1 ] ;
+   ld_t ad[ r + 1 ] ;
 
 /*
  * Create dense frequency grid
@@ -578,7 +578,7 @@ int remez( long double h[], int numtaps, int numband, const double bands[],
    if ( type == DIFFERENTIATOR ) {
       for ( int i = 0 ; i < gridsize ; i++ ) {
 /* D[i] = D[i]*Grid[i]; */
-         if ( D[i] > 0.0001 )
+         if ( D[i] > 1e-12 )
             W[i] = W[i] / Grid[i] ;
       }
    }
@@ -587,26 +587,29 @@ int remez( long double h[], int numtaps, int numband, const double bands[],
  * For odd or Negative symmetry filters, alter the
  * D[] and W[] according to Parks McClellan
  */
+   ld_t c ;
+   int iter ;
+
    if ( symmetry == POSITIVE ) {
       if ( numtaps % 2 == 0 ) {
-         for (int i = 0 ; i < gridsize ; i++) {
+         for ( int i = 0 ; i < gridsize ; i++ ) {
             c = cos( M_PI * Grid[i] ) ;
-            D[i] /= c ;
-            W[i] *= c ;
+            D[ i ] /= c ;
+            W[ i ] *= c ;
          }
       }
    } else {
       if ( numtaps % 2 ) {
          for ( int i = 0 ; i < gridsize ; i++ ) {
             c = sin( M_PI * 2.0 * Grid[i] ) ;
-            D[i] /= c ;
-            W[i] *= c ;
+            D[ i ] /= c ;
+            W[ i ] *= c ;
          }
       } else {
          for ( int i = 0 ; i < gridsize ; i++ ) {
             c = sin( M_PI * Grid[i] ) ;
-            D[i] /= c ;
-            W[i] *= c ;
+            D[ i ] /= c ;
+            W[ i ] *= c ;
          }
       }
    }
@@ -636,7 +639,7 @@ int remez( long double h[], int numtaps, int numband, const double bands[],
    for ( int i = 0 ; i <= numtaps / 2 ; i++ ) {
       if ( symmetry == POSITIVE ) {
          if ( numtaps % 2 )
-            c = 1.0 ;
+            c = 1.0L ;
          else
             c = cos( M_PI * (double)i / numtaps ) ;
       } else {
