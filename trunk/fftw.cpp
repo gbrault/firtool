@@ -1,5 +1,5 @@
 
-#include "fftw3.h"
+#include "fftw.h"
 
 void fftf( fftwl_complex x[], fftwl_complex y[], int n ) {
     fftwl_plan pPlan = fftwl_plan_dft_1d( n, x, y, FFTW_FORWARD, FFTW_ESTIMATE ) ;

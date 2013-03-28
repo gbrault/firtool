@@ -6,8 +6,8 @@ typedef enum _RV {
     RV_III1, RV_III2, RV_III3, RV_III4
 } RV_t ;
 
-void rifeVincentII( long double * W, int aLen , double aAtten, int M ) ;
-void rifeVincent( RV_t type, long double * W, int aLen ) ;
+void rifeVincentII( ld_t * W, int aLen , double aAtten, int M ) ;
+void rifeVincent( RV_t type, ld_t * W, int aLen ) ;
 
 
 #endif // WINDOWRIFEVINCENT_H
