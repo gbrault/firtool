@@ -1,7 +1,8 @@
 
 #include <math.h>
+#include "double.h"
 
-void harris( long double * W, int aLen ) {
+void harris( ld_t * W, int aLen ) {
     for ( int k = 0 ; k < aLen ; k += 1 )
         W[ k ] =
             +0.35875L +
@@ -11,7 +12,7 @@ void harris( long double * W, int aLen ) {
             +0.00000L * cosl( 8.0L * M_PI * k / ( aLen - 1 ) ) ;
 }
 
-void nuttall( long double * W, int aLen ) {
+void nuttall( ld_t * W, int aLen ) {
     for ( int k = 0 ; k < aLen ; k += 1 )
         W[ k ] =
             +0.3635819L +
@@ -21,7 +22,7 @@ void nuttall( long double * W, int aLen ) {
             +0.0000000L * cosl( 8.0L * M_PI * k / ( aLen - 1 ) ) ;
 }
 
-void flattop( long double * W, int aLen ) {
+void flattop( ld_t * W, int aLen ) {
     for ( int k = 0 ; k < aLen ; k += 1 )
         W[ k ] =
             +1.000L +
@@ -29,4 +30,15 @@ void flattop( long double * W, int aLen ) {
             +1.290L * cosl( 4.0L * M_PI * k / ( aLen - 1 ) ) +
             -0.388L * cosl( 6.0L * M_PI * k / ( aLen - 1 ) ) +
             +0.028L * cosl( 8.0L * M_PI * k / ( aLen - 1 ) ) ;
+}
+
+void connes( ld_t * W, int aLen ) {
+    int n = aLen / 2 ;
+    int p = ( aLen + 1 ) / 2 ;
+
+    int l = aLen - 1 ;
+    for ( int k = 0 ; k < n ; k += 1, l -= 1 ) {
+        W[ k ] = powl( 1.0L - powl( ( (ld_t)k - n ) / p, 2 ), 2 ) ;
+        W[ l ] = W[ k ] ;
+    }
 }

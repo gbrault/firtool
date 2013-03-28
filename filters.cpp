@@ -1,10 +1,11 @@
 
 #include "math.h"
+#include "double.h"
 #include "filters.h"
 
-void lowPass( long double * T, double stop_freq, long double * W, int aLen ) {
+void lowPass( ld_t * T, double stop_freq, ld_t * W, int aLen ) {
     int M = ( aLen - 1 ) / 2 ;
-    long double fwT0 = 2.0L * M_PI * stop_freq ;
+    ld_t fwT0 = 2.0L * M_PI * stop_freq ;
 
     for ( int n = -M ; n <= M ; n++ )
         if ( n == 0 )
@@ -12,14 +13,14 @@ void lowPass( long double * T, double stop_freq, long double * W, int aLen ) {
         else
             T[ n + M ] = sin( n * fwT0 ) / ( n * M_PI ) * W[ n + M ] ;
 
-    long double scale = 2.0L * fabsl( T[ 0 + M ] ) ;
+    ld_t scale = 2.0L * fabsl( T[ 0 + M ] ) ;
     for( int i = 0 ; i < aLen ; i++ )
         T[ i ] /= scale ;
 }
 
-void highPass( long double * T, double start_freq, long double * W, int aLen ) {
+void highPass( ld_t * T, double start_freq, ld_t * W, int aLen ) {
     int M = ( aLen - 1 ) / 2 ;
-    long double fwT0 = 2.0L * M_PI * start_freq ;
+    ld_t fwT0 = 2.0L * M_PI * start_freq ;
 
     for ( int n = -M; n <= M; n++ )
         if ( n == 0 )
@@ -27,15 +28,15 @@ void highPass( long double * T, double start_freq, long double * W, int aLen ) {
         else
             T[ n + M ] = -sin( n * fwT0 ) / ( n * M_PI ) * W[ n + M ] ;
 
-    long double scale = 2.0L * fabsl( T[ 0 + M ] ) ;
+    ld_t scale = 2.0L * fabsl( T[ 0 + M ] ) ;
     for( int i = 0 ; i < aLen ; i++ )
         T[ i ] /= scale ;
 }
 
-void bandPass( long double * T, double start_freq, double stop_freq, long double * W, int aLen ) {
+void bandPass( ld_t * T, double start_freq, double stop_freq, ld_t * W, int aLen ) {
     int M = ( aLen - 1 ) / 2 ;
-    long double fwT0 = 2.0L * M_PI * start_freq ;
-    long double fwT1 = 2.0L * M_PI * stop_freq ;
+    ld_t fwT0 = 2.0L * M_PI * start_freq ;
+    ld_t fwT1 = 2.0L * M_PI * stop_freq ;
 
     for ( int n = -M; n <= M; n++ )
         if ( n == 0 )
@@ -43,15 +44,15 @@ void bandPass( long double * T, double start_freq, double stop_freq, long double
         else
             T[ n + M ] = ( sin( n * fwT1 ) - sin( n * fwT0 ) ) * W[ n + M ] / ( n * M_PI ) ;
 
-    long double scale = 2.0L * fabsl( T[ 0 + M ] ) ;
+    ld_t scale = 2.0L * fabsl( T[ 0 + M ] ) ;
     for( int i = 0 ; i < aLen ; i++ )
         T[ i ] /= scale ;
 }
 
-void bandStop( long double * T, double stop_freq, double start_freq, long double * W, int aLen ) {
+void bandStop( ld_t * T, double stop_freq, double start_freq, ld_t * W, int aLen ) {
     int M = ( aLen - 1 ) / 2 ;
-    long double fwT0 = 2.0L * M_PI * stop_freq ;
-    long double fwT1 = 2.0L * M_PI * start_freq ;
+    ld_t fwT0 = 2.0L * M_PI * stop_freq ;
+    ld_t fwT1 = 2.0L * M_PI * start_freq ;
 
     for ( int n = -M ; n <= M ; n++ )
         if ( n == 0 )
@@ -59,15 +60,15 @@ void bandStop( long double * T, double stop_freq, double start_freq, long double
         else
             T[ n + M ] = ( sin( n * fwT0 ) - sin( n * fwT1 ) ) * W[ n + M ] / ( n * M_PI ) ;
 
-    long double scale = 2.0L * fabsl( T[ 0 + M ] ) ;
+    ld_t scale = 2.0L * fabsl( T[ 0 + M ] ) ;
     for( int i = 0 ; i < aLen ; i++ )
         T[ i ] /= scale ;
 }
 
-void differentiator( long double * T, double stop_freq, double start_freq, long double * W, int aLen ) {
+void differentiator( ld_t * T, double stop_freq, double start_freq, ld_t * W, int aLen ) {
     int M = ( aLen - 1 ) / 2 ;
-    long double fwT0 = 2.0L * M_PI * stop_freq ;
-    long double fwT1 = 2.0L * M_PI * start_freq ;
+    ld_t fwT0 = 2.0L * M_PI * stop_freq ;
+    ld_t fwT1 = 2.0L * M_PI * start_freq ;
 
     for ( int n = -M ; n <= M ; n++ )
         if ( n == 0 )
@@ -75,21 +76,21 @@ void differentiator( long double * T, double stop_freq, double start_freq, long 
         else
             T[ n + M ] = ( sin( n * fwT0 ) - sin( n * fwT1 ) ) * W[ n + M ] / ( n * M_PI ) ;
 
-    long double scale = 2.0L * fabsl( T[ 0 + M ] ) ;
+    ld_t scale = 2.0L * fabsl( T[ 0 + M ] ) ;
     for( int i = 0 ; i < aLen ; i++ )
         T[ i ] /= scale ;
 }
 
-void gaussian( long double * T, double spb, double bt, int aLen ) {
-    long double dt = 1.0L / spb ;
-    long double s = 1.0 / ( sqrtl( logl( 2.0L ) ) / ( 2.0L * (long double)M_PI * bt ) ) ;
+void gaussian( ld_t * T, double spb, double bt, int aLen ) {
+    ld_t dt = 1.0L / spb ;
+    ld_t s = 1.0 / ( sqrtl( logl( 2.0L ) ) / ( 2.0L * (ld_t)M_PI * bt ) ) ;
 
-    long double t0 = -0.5L * aLen - 0.5L ;
-    long double scale = 0.0L ;
+    ld_t t0 = -0.5L * aLen - 0.5L ;
+    ld_t scale = 0.0L ;
 
     for ( int i = 0 ; i < aLen ; i++ ) {
         t0 += 1.0L ;
-        long double ts = s * dt * t0 ;
+        ld_t ts = s * dt * t0 ;
         T[ i ] = expl( -0.5L * ts * ts ) ;
         scale += T[ i ] ;
     }
@@ -97,7 +98,7 @@ void gaussian( long double * T, double spb, double bt, int aLen ) {
         T[ i ] /= scale ;
 }
 
-void rootRaisedCosine( long double * T, double spb, double alpha, int aLen ) {
+void rootRaisedCosine( ld_t * T, double spb, double alpha, int aLen ) {
     double scale = 0 ;
 
     for ( int i = 0 ; i < aLen ; i++ ) {
