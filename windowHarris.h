@@ -1,9 +1,9 @@
 #ifndef WINDOWHARRIS_H
 #define WINDOWHARRIS_H
 
-void harris( long double * W, int aLen ) ;
-void nuttall( long double * W, int aLen ) ;
-void flattop( long double * W, int aLen ) ;
-void connes( long double * W, int aLen ) ;
+void harris( ld_t * W, int aLen ) ;
+void nuttall( ld_t * W, int aLen ) ;
+void flattop( ld_t * W, int aLen ) ;
+void connes( ld_t * W, int aLen ) ;
 
 #endif // WINDOWHARRIS_H

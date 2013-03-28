@@ -124,6 +124,13 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
+void MainWindow::on_actionAbout_triggered() {
+    QMessageBox::about( this, "FIRTool", windowTitle() +
+        "\n\nThis program comes with ABSOLUTELY NO WARRANTY.\n" +
+        "This is free software, and you are welcome to redistribute it " +
+        "under certain conditions. See <http://www.gnu.org/licenses/>"
+    ) ;
+}
 
 void MainWindow::on_actionDesign_triggered() {
     Window.clear() ;
@@ -146,28 +153,27 @@ void MainWindow::on_actionDesign_triggered() {
 }
 
 void MainWindow::doCheby( void ) {
-    QVector<ld_t> W( nTaps ) ;
+    Window.resize( nTaps ) ;
     for ( int n = 0 ; n < nTaps ; n += 1 )
-        W[ n ] = 0.0L ;
+        Window[ n ] = 0.0L ;
 
     double beta = ui->dsbChebyBeta->value() ;
-    chebyshev( W.data(), nTaps, beta ) ;
-    Window = W ;
+    chebyshev( Window.data(), nTaps, beta ) ;
 
     // filter type
     QVector<ld_t> T( nTaps ) ;
     switch ( ui->twType->currentIndex() ) {
     case 0 :
-        lowPass( T.data(), ui->dsbLPStop->value(), W.data(), nTaps ) ;
+        lowPass( T.data(), ui->dsbLPStop->value(), Window.data(), nTaps ) ;
         break ;
     case 1 :
-        highPass( T.data(), ui->dsbHPStart->value(), W.data(), nTaps ) ;
+        highPass( T.data(), ui->dsbHPStart->value(), Window.data(), nTaps ) ;
         break ;
     case 2 :
-        bandPass( T.data(), ui->dsbBPStart->value(), ui->dsbBPStop->value(), W.data(), nTaps ) ;
+        bandPass( T.data(), ui->dsbBPStart->value(), ui->dsbBPStop->value(), Window.data(), nTaps ) ;
         break ;
     case 3 :
-        bandStop( T.data(), ui->dsbBSStop->value(), ui->dsbBSStart->value(), W.data(), nTaps ) ;
+        bandStop( T.data(), ui->dsbBSStop->value(), ui->dsbBSStart->value(), Window.data(), nTaps ) ;
         break ;
     default :
         statusBar()->showMessage( "Chebyshev: <not implemented yet>", 2000 ) ;
@@ -176,88 +182,83 @@ void MainWindow::doCheby( void ) {
 }
 
 void MainWindow::doKaiser( void ) {
-    QVector<ld_t> W( nTaps ) ;
+    Window.resize( nTaps ) ;
     for ( int n = 0 ; n < nTaps ; n += 1 )
-        W[ n ] = 0.0L ;
+        Window[ n ] = 0.0L ;
 
     double beta = ui->dsbKaiserBeta->value() ;
-    kaiser( W.data(), nTaps, beta ) ;
-    Window = W ;
+    kaiser( Window.data(), nTaps, beta ) ;
 
     // filter type
-    QVector<ld_t> T( nTaps ) ;
+    Coefs.resize( nTaps ) ;
     switch ( ui->twType->currentIndex() ) {
     case 0 :
-        lowPass( T.data(), ui->dsbLPStop->value(), W.data(), nTaps ) ;
+        lowPass( Coefs.data(), ui->dsbLPStop->value(), Window.data(), nTaps ) ;
         break ;
     case 1 :
-        highPass( T.data(), ui->dsbHPStart->value(), W.data(), nTaps ) ;
+        highPass( Coefs.data(), ui->dsbHPStart->value(), Window.data(), nTaps ) ;
         break ;
     case 2 :
-        bandPass( T.data(), ui->dsbBPStart->value(), ui->dsbBPStop->value(), W.data(), nTaps ) ;
+        bandPass( Coefs.data(), ui->dsbBPStart->value(), ui->dsbBPStop->value(), Window.data(), nTaps ) ;
         break ;
     case 3 :
-        bandStop( T.data(), ui->dsbBSStop->value(), ui->dsbBSStart->value(), W.data(), nTaps ) ;
+        bandStop( Coefs.data(), ui->dsbBSStop->value(), ui->dsbBSStart->value(), Window.data(), nTaps ) ;
         break ;
     default :
         statusBar()->showMessage( "Kaiser: <not implemented yet>", 2000 ) ;
     }
-    Coefs = T ;
 }
 
 void MainWindow::doWindowed( void ) {
-    QVector<ld_t> W( nTaps ) ;
+    Window.resize( nTaps ) ;
     for ( int n = 0 ; n < nTaps ; n += 1 )
-        W[ n ] = 0.0L ;
+        Window[ n ] = 0.0L ;
 
     double atten = ui->dsbAtten->value() ;
 
     // filter window
     switch ( ui->cbFilterType->currentIndex() ) {
     case 0 :
-        rifeVincentII( W.data(), nTaps, atten, (int)ui->dsbSubtype->value() ) ;
+        rifeVincentII( Window.data(), nTaps, atten, (int)ui->dsbSubtype->value() ) ;
         break ;
     case 1 :
-        rifeVincent( (RV_t)ui->dsbSubtype->value(), W.data(), nTaps ) ;
+        rifeVincent( (RV_t)ui->dsbSubtype->value(), Window.data(), nTaps ) ;
         break ;
     case 2 :
-        harris( W.data(), nTaps ) ;
+        harris( Window.data(), nTaps ) ;
         break ;
     case 3 :
-        nuttall( W.data(), nTaps ) ;
+        nuttall( Window.data(), nTaps ) ;
         break ;
     case 4 :
-        flattop( W.data(), nTaps ) ;
+        flattop( Window.data(), nTaps ) ;
         break ;
     case 5 :
-        connes( W.data(), nTaps ) ;
+        connes( Window.data(), nTaps ) ;
         break ;
     }
-    Window = W ;
 
     // filter type
-    QVector<ld_t> T( nTaps ) ;
+    Coefs.resize( nTaps ) ;
     switch ( ui->twType->currentIndex() ) {
     case 0 :
-        lowPass( T.data(), ui->dsbLPStop->value(), W.data(), nTaps ) ;
+        lowPass( Coefs.data(), ui->dsbLPStop->value(), Window.data(), nTaps ) ;
         break ;
     case 1 :
-        highPass( T.data(), ui->dsbHPStart->value(), W.data(), nTaps ) ;
+        highPass( Coefs.data(), ui->dsbHPStart->value(), Window.data(), nTaps ) ;
         break ;
     case 2 :
-        bandPass( T.data(), ui->dsbBPStart->value(), ui->dsbBPStop->value(), W.data(), nTaps ) ;
+        bandPass( Coefs.data(), ui->dsbBPStart->value(), ui->dsbBPStop->value(), Window.data(), nTaps ) ;
         break ;
     case 3 :
-        bandStop( T.data(), ui->dsbBSStop->value(), ui->dsbBSStart->value(), W.data(), nTaps ) ;
+        bandStop( Coefs.data(), ui->dsbBSStop->value(), ui->dsbBSStart->value(), Window.data(), nTaps ) ;
         break ;
     default :
         statusBar()->showMessage( "Windowed: <not implemented yet>", 2000 ) ;
     }
-    Coefs = T ;
 }
 
 void MainWindow::doRemez( void ) {
-    QVector<ld_t> T( nTaps ) ;
     QVector<ld_t> bands ;
     QVector<ld_t> response ;
     QVector<ld_t> weight ;
@@ -326,7 +327,8 @@ void MainWindow::doRemez( void ) {
         return ;
     }
 
-    int err = remez( T.data(), nTaps, nbands, bands.data(), response.data(), weight.data(), type, 64 ) ;
+    Coefs.resize( nTaps ) ;
+    int err = remez( Coefs.data(), nTaps, nbands, bands.data(), response.data(), weight.data(), type, 64 ) ;
 
     switch ( err ) {
     case -1 :
@@ -338,38 +340,35 @@ void MainWindow::doRemez( void ) {
     case -3 :
         statusBar()->showMessage( "Remez: too many extremals -- cannot continue", 2000 ) ;
         break ;
-    default :
-        Coefs = T ;
     }
 }
 
 void MainWindow::doRRC( void ) {
-    QVector<ld_t> T( nTaps ) ;
-    rootRaisedCosine( T.data(), ui->dsbRRCSPS->value(), ui->dsbRRCBeta->value(), nTaps ) ;
-    Coefs = T ;
+    Coefs.resize( nTaps ) ;
+    rootRaisedCosine( Coefs.data(), ui->dsbRRCSPS->value(), ui->dsbRRCBeta->value(), nTaps ) ;
 }
 
 void MainWindow::doGauss( void ) {
-    QVector<ld_t> T( nTaps ) ;
-    gaussian( T.data(), ui->dsbGSPS->value(), ui->dsbGBT->value(), nTaps ) ;
-    Coefs = T ;
+    Coefs.resize( nTaps ) ;
+    gaussian( Coefs.data(), ui->dsbGSPS->value(), ui->dsbGBT->value(), nTaps ) ;
 }
 
 #include <complex>
 int newton_real( register int n, const double coeff[], std::complex<double> res[] ) ;
 void MainWindow::findRoots( int nTaps ) {
-    std::complex<double> zeroes[ 1024 ] ;
     double t[ nTaps ] ;
     for ( int i = 0 ; i < nTaps ; i += 1 )
         t[ i ] = Coefs[ i ] ;
+
+    std::complex<double> zeroes[ nTaps ] ;
     newton_real( nTaps, t, zeroes ) ;
+
     ZeroesReal.resize( nTaps ) ;
     ZeroesImag.resize( nTaps ) ;
     for ( int i = 0 ; i < nTaps ; i += 1 ) {
         ZeroesReal[ i ] = zeroes[ i ].real() ;
         ZeroesImag[ i ] = zeroes[ i ].imag() ;
     }
-//    qDebug() << zeroes[ 0 ].real() << zeroes[ 1 ].real() ;
 }
 
 void MainWindow::doShow( void ) {
@@ -382,6 +381,7 @@ void MainWindow::doShow( void ) {
     for ( int i = 0 ; i < nTaps ; i += 1 )
         x[ i ] = (double)i ;
 
+    // do time plots
     if ( ! Window.isEmpty() ) {
         QVector<double> w( nTaps ) ;
         for ( int i = 0 ; i < nTaps ; i += 1 )
@@ -400,11 +400,8 @@ void MainWindow::doShow( void ) {
     if ( Coefs.isEmpty() )
         return ;
 
-    findRoots( nTaps ) ;
-    customPlotZero->graph(0)->setData( ZeroesReal, ZeroesImag ) ;
-    customPlotZero->replot() ;
-
-    int FFTLEN = nTaps < 2048 ? 2048 : nTaps ;
+    // do freq char plot
+    int FFTLEN = nTaps < 4096 ? 4096 : nTaps ;
 
     QVector<double> x2( FFTLEN ) ;
     for ( int i = 0 ; i < FFTLEN / 2 ; i += 1 )
@@ -431,15 +428,21 @@ void MainWindow::doShow( void ) {
 
     customPlotFreq->replot() ;
 
+    // do zeroes plot
+    findRoots( nTaps ) ;
+    customPlotZero->graph(0)->setData( ZeroesReal, ZeroesImag ) ;
+    customPlotZero->replot() ;
+
+    // fill list view of coefficients, window
     double range = pow( 2, ui->dsbNBits->value() ) - 1 ;
     ui->twCoefs->clear();
     for ( int i = 0 ; i < nTaps ; i += 1 ) {
         QStringList columns ;
-        columns << QString("%1").arg( i ) ;
-        columns << QString("%1").arg( trunc( Coefs[ i ] * 1E9 ) / 1E9, 0, 'g', 9 ) ;
-        columns << QString("%1").arg( trunc( Coefs[ i ] * range ), 0, 'g', 9 ) ;
+        columns << QString( "%1" ).arg( i ) ;
+        columns << QString( "%1" ).arg( trunc( Coefs[ i ] * 1E9 ) / 1E9, 0, 'g', 9 ) ;
+        columns << QString( "%1" ).arg( trunc( Coefs[ i ] * range ), 0, 'g', 9 ) ;
         if ( ! Window.isEmpty() )
-            columns << QString("%1").arg( trunc( Window[ i ] * 1E9 ) / 1E9, 0, 'g', 9 ) ;
+            columns << QString( "%1" ).arg( trunc( Window[ i ] * 1E9 ) / 1E9, 0, 'g', 9 ) ;
         else
             columns << "" ;
         ui->twCoefs->addTopLevelItem( new QTreeWidgetItem( columns ) ) ;
@@ -451,7 +454,8 @@ void MainWindow::on_actionSave_Coefs_triggered() {
         return ;
 
     QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Save Coefficient File"), ".", tr( "Xilinx coefficient files (*.coe);;C/C++ include files (*.h);;VHDL files (*.vhd);;All files (*.*)" ) ) ;
+        this, tr("Save Coefficient File"), ".", tr(
+            "Xilinx coefficient files (*.coe);;C/C++ include files (*.h);;VHDL files (*.vhd);;All files (*.*)" ) ) ;
     if ( fileName.isEmpty() )
         return ;
 
@@ -496,14 +500,6 @@ void MainWindow::on_actionSave_Coefs_triggered() {
     file.close() ;
 }
 
-void MainWindow::on_actionAbout_triggered() {
-    QMessageBox::about( this, "FIRTool", windowTitle() +
-        "\n\nThis program comes with ABSOLUTELY NO WARRANTY.\n" +
-        "This is free software, and you are welcome to redistribute it " +
-        "under certain conditions. See <http://www.gnu.org/licenses/>"
-    ) ;
-}
-
 void MainWindow::closeEvent( QCloseEvent *event ) {
 //    writeSettings() ;
     event->accept() ;
@@ -523,7 +519,6 @@ void MainWindow::on_twMethod_currentChanged( int index ) {
     doUIenables();
 }
 
-
 void MainWindow::on_cbFilterType_currentIndexChanged( int index ) {
     (void)index;
 //    ui->dsbSubtype->setEnabled( index == 0 || index == 1 ) ;
@@ -537,10 +532,11 @@ void MainWindow::on_cbFilterType_currentIndexChanged( int index ) {
 void MainWindow::on_pbEstimate_clicked() {
     double tw = ui->dsbTW->value() ;
     double attn = ui->dsbAtten->value() ;
-    double dp = - attn / 20 ;
-    double ds = - attn / 20 ;
+    double dp = - attn / 20.0 ;
+    double ds = - attn / 20.0 ;
     int nTaps = 3 ;
 
+    // various estimators
     switch ( ui->twMethod->currentIndex() ) {
     case 0 : {
             nTaps = ceil( 1 + acosh( 1 / pow( 10.0, dp ) ) / tw / 2 ) ;

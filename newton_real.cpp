@@ -337,7 +337,7 @@ iter2:
          }
       }
 
-   quadratic( n, a, res );
+   quadratic( n, a, res ) ;
 
    delete [] a1;
    delete [] a;

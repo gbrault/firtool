@@ -1,10 +1,11 @@
 
 #include <math.h>
+#include "double.h"
 #include "fftw.h"
 
-static void cheb( fftwl_complex y[], long double beta,  int n ) {
+static void cheb( fftwl_complex y[], ld_t beta,  int n ) {
     for ( int i = 0 ; i < n ; i += 1, y++ ) {
-        long double a = fabsl( beta * cosl( (long double)M_PI * i / n ) ) ;
+        ld_t a = fabsl( beta * cosl( (ld_t)M_PI * i / n ) ) ;
         if ( a > 1.0L )
             (*y)[ 0 ] = powl( -1.0L, i ) * coshl( acoshl( a ) * n ) ;
         else
@@ -13,7 +14,7 @@ static void cheb( fftwl_complex y[], long double beta,  int n ) {
     }
 }
 
-void chebyshev( long double * W, int aLen, double beta ) {
+void chebyshev( ld_t * W, int aLen, double beta ) {
     if ( aLen < 0 )
         return ;
     else if ( aLen == 1 )

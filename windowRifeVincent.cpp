@@ -1,42 +1,41 @@
 
 #include <math.h>
+#include "double.h"
 #include <windowRifeVincent.h>
-#include <QDebug>
 
 // Class II weighting functions (Taylor)
 // according to BSTJ Feb. 1970, p. 207-209
 
-static void taylor( long double D[], int M, double aAtten ) {
-    long double R = powl( 10.0L, aAtten / 20.0L ) ;
-    long double L = log( R + sqrtl( R * R - 1.0L ) ) / (long double)M_PI ; // (48)
-    long double L2 = L * L ;
+static void taylor( ld_t D[], int M, double aAtten ) {
+    ld_t R = powl( 10.0L, aAtten / 20.0L ) ;
+    ld_t L = log( R + sqrtl( R * R - 1.0L ) ) / (ld_t)M_PI ; // (48)
+    ld_t L2 = L * L ;
 
-    long double M_1 = M + 1.0L ;
-    long double M_5 = M + 0.5L ;
-    long double sigma2 = M_1 * M_1 / ( L * L + sqrtl( L2 + M_5 * M_5 ) ) ; // (47)
+    ld_t M_1 = M + 1.0L ;
+    ld_t M_5 = M + 0.5L ;
+    ld_t sigma2 = M_1 * M_1 / ( L * L + sqrtl( L2 + M_5 * M_5 ) ) ; // (47)
 
     D[ 0 ] = 1.0L ;
     for ( int n = 1 ; n < M ; n += 1 ) { // (45)
-        long double dp = 1.0L ;
-        long double np = 1.0L ;
-        long double n2 = n * n ;
+        ld_t dp = 1.0L ;
+        ld_t np = 1.0L ;
+        ld_t n2 = n * n ;
         for ( int K = 1 ; K < M ; K += 1 ) {
-            long double K2 = K * K ;
+            ld_t K2 = K * K ;
             if ( K != n )
                 dp *= 1.0L - n2 / K2 ;
 
-            long double K_5 = K - 0.5L ;
+            ld_t K_5 = K - 0.5L ;
             np *= 1.0L - n2 / sigma2 / ( L2 + K_5 * K_5 )  ;
         }
         D[ n ] = - np / dp ;
-//        qDebug() << n << (double)D[ n ] ;
     }
 }
 
-void rifeVincentII( long double * W, int aLen, double aAtten, int M ) {
-    long double D[ M ] ;
+void rifeVincentII( ld_t * W, int aLen, double aAtten, int M ) {
+    ld_t D[ M ] ;
     taylor( D, M, aAtten ) ;
-    long double Wm = -1E100 ;
+    ld_t Wm = -1E100 ;
 
     for ( int k = 0 ; k < aLen ; k += 1 ) {
         W[ k ] = D[ 0 ] ;
@@ -50,7 +49,7 @@ void rifeVincentII( long double * W, int aLen, double aAtten, int M ) {
 }
 
 // Class I and III
-void rifeVincent( RV_t type, long double * W, int aLen ) {
+void rifeVincent( RV_t type, ld_t * W, int aLen ) {
     switch ( type ) {
     default :
     case RV_I1 :
