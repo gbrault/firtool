@@ -32,6 +32,7 @@
  *************************************************************************/
 
 #include <math.h>
+#include "double.h"
 #include "remez.h"
 
 typedef enum _PN {

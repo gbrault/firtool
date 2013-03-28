@@ -23,7 +23,8 @@ SOURCES += \
     windowKaiser.cpp \
     windowHarris.cpp \
     windowRifeVincent.cpp \
-    remez.cpp
+    remez.cpp \
+    Newton_Real.cpp
 #    zolotarevFIR.cpp
 
 HEADERS  += \
@@ -37,7 +38,8 @@ HEADERS  += \
     freqchar.h \
     windowCheby.h \
     windowKaiser.h \
-    remez.h
+    remez.h \
+    double.h
 #    zolotarevFIR.hpp
 
 FORMS    += mainwindow.ui

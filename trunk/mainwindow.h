@@ -10,9 +10,9 @@
 
 #include "qcustomplot.h"
 
+#include "double.h"
 #include "filters.h"
 #include "remez.h"
-//#include "zolotarev.hpp"
 #include "freqchar.h"
 
 #include <windowCheby.h>
@@ -33,6 +33,7 @@ public:
     ~MainWindow();
     
     void closeEvent(QCloseEvent *event);
+    void findRoots(int nTaps);
 private slots:
     void on_actionDesign_triggered();
     void on_actionSave_Coefs_triggered();
@@ -55,14 +56,17 @@ private:
     void doShow();
     void doUIenables();
 
-    Ui::MainWindow *ui;
+    Ui::MainWindow * ui ;
     QCustomPlot * customPlotFreq ;
     QCustomPlot * customPlotTime ;
+    QCustomPlot * customPlotZero ;
 
     int nTaps ;
 
-    QVector<long double> Coefs ;
-    QVector<long double> Window ;
+    QVector<ld_t> Coefs ;
+    QVector<ld_t> Window ;
+    QVector<double> ZeroesReal ;
+    QVector<double> ZeroesImag ;
 } ;
 
 #endif // MAINWINDOW_H

@@ -38,9 +38,9 @@ MainWindow::MainWindow( QWidget *parent ) :
 
     customPlotTime->setNoAntialiasingOnDrag( true ) ;
 
-    customPlotTime->addGraph();
+    customPlotTime->addGraph() ;
     customPlotTime->graph(0)->setPen( QPen( Qt::lightGray ) ) ;
-    customPlotTime->addGraph();
+    customPlotTime->addGraph() ;
     customPlotTime->graph(1)->setPen( QPen( Qt::blue ) ) ;
 
     customPlotTime->graph(1)->setScatterStyle( QCP::ssCircle ) ;
@@ -60,10 +60,39 @@ MainWindow::MainWindow( QWidget *parent ) :
     customPlotTime->setRangeZoom( Qt::Horizontal | Qt::Vertical ) ;
     customPlotTime->setInteraction(QCustomPlot::iSelectPlottables); // allow selection of graphs via mouse click
 
+    customPlotZero = new QCustomPlot() ;
+    ui->loZero->addWidget( customPlotZero ) ;
+    customPlotZero->setupFullAxesBox() ;
+    customPlotZero->xAxis->setRange( QCPRange( -1.3, 1.3 ) ) ;
+    customPlotZero->yAxis->setRange( QCPRange( -1.3, 1.3 ) ) ;
+    customPlotZero->xAxis->setSubGrid( true ) ;
+    customPlotZero->yAxis->setSubGrid( true ) ;
+    customPlotZero->xAxis->setAutoTickStep( false ) ;
+    customPlotZero->yAxis->setAutoTickStep( false ) ;
+    customPlotZero->xAxis->setTickStep( 0.2 ) ;
+    customPlotZero->yAxis->setTickStep( 0.2 ) ;
+    customPlotZero->addGraph( ) ;
+    customPlotZero->graph( 0 )->setScatterStyle( QCP::ssCircle ) ;
+    customPlotZero->graph( 0 )->setScatterSize( 6 ) ;
+    customPlotZero->graph( 0 )->setLineStyle( QCPGraph::lsNone ) ;
+    customPlotZero->setRangeDrag( Qt::Horizontal | Qt::Vertical ) ;
+    customPlotZero->setRangeZoom( Qt::Horizontal | Qt::Vertical ) ;
+
+    // make left and bottom axes always transfer their ranges to right and top axes:
+    connect(customPlotZero->xAxis, SIGNAL(rangeChanged(QCPRange)), customPlotZero->xAxis2, SLOT(setRange(QCPRange)));
+    connect(customPlotZero->yAxis, SIGNAL(rangeChanged(QCPRange)), customPlotZero->yAxis2, SLOT(setRange(QCPRange)));
+
+    QCPItemEllipse * unitcircle = new QCPItemEllipse( customPlotZero ) ;
+    customPlotZero->addItem( unitcircle ) ;
+    unitcircle->setPen( QPen( Qt::gray ) ) ;
+    unitcircle->topLeft->setCoords( 1, -1 ) ;
+    unitcircle->bottomRight->setCoords( -1, 1 ) ;
+
+
     ui->cbFilterType->addItems(
         QStringList()
             << " Taylor" << " Rife-Vincent"
-            << " harris" << " Nuttall" << " Flat top"
+            << " harris" << " Nuttall" << " Flat top" << "Connes"
     ) ;
 
     ui->twCoefs->setHeaderLabels( QStringList() << "Index" << "Coefs" << "Actual" << "Window" ) ;
@@ -77,8 +106,9 @@ MainWindow::MainWindow( QWidget *parent ) :
     ui->hSplitterTop->setStretchFactor( 0, 40 ) ;
     ui->hSplitterTop->setStretchFactor( 1, 60 ) ;
 
-    customPlotTime->replot() ;
     customPlotFreq->replot() ;
+    customPlotTime->replot() ;
+    customPlotZero->replot() ;
 
     // exit
     connect( ui->actionExit, SIGNAL( triggered() ), this, SLOT( close() ) ) ;
@@ -116,7 +146,7 @@ void MainWindow::on_actionDesign_triggered() {
 }
 
 void MainWindow::doCheby( void ) {
-    QVector<long double> W( nTaps ) ;
+    QVector<ld_t> W( nTaps ) ;
     for ( int n = 0 ; n < nTaps ; n += 1 )
         W[ n ] = 0.0L ;
 
@@ -125,7 +155,7 @@ void MainWindow::doCheby( void ) {
     Window = W ;
 
     // filter type
-    QVector<long double> T( nTaps ) ;
+    QVector<ld_t> T( nTaps ) ;
     switch ( ui->twType->currentIndex() ) {
     case 0 :
         lowPass( T.data(), ui->dsbLPStop->value(), W.data(), nTaps ) ;
@@ -146,7 +176,7 @@ void MainWindow::doCheby( void ) {
 }
 
 void MainWindow::doKaiser( void ) {
-    QVector<long double> W( nTaps ) ;
+    QVector<ld_t> W( nTaps ) ;
     for ( int n = 0 ; n < nTaps ; n += 1 )
         W[ n ] = 0.0L ;
 
@@ -155,7 +185,7 @@ void MainWindow::doKaiser( void ) {
     Window = W ;
 
     // filter type
-    QVector<long double> T( nTaps ) ;
+    QVector<ld_t> T( nTaps ) ;
     switch ( ui->twType->currentIndex() ) {
     case 0 :
         lowPass( T.data(), ui->dsbLPStop->value(), W.data(), nTaps ) ;
@@ -176,7 +206,7 @@ void MainWindow::doKaiser( void ) {
 }
 
 void MainWindow::doWindowed( void ) {
-    QVector<long double> W( nTaps ) ;
+    QVector<ld_t> W( nTaps ) ;
     for ( int n = 0 ; n < nTaps ; n += 1 )
         W[ n ] = 0.0L ;
 
@@ -199,11 +229,14 @@ void MainWindow::doWindowed( void ) {
     case 4 :
         flattop( W.data(), nTaps ) ;
         break ;
+    case 5 :
+        connes( W.data(), nTaps ) ;
+        break ;
     }
     Window = W ;
 
     // filter type
-    QVector<long double> T( nTaps ) ;
+    QVector<ld_t> T( nTaps ) ;
     switch ( ui->twType->currentIndex() ) {
     case 0 :
         lowPass( T.data(), ui->dsbLPStop->value(), W.data(), nTaps ) ;
@@ -224,11 +257,10 @@ void MainWindow::doWindowed( void ) {
 }
 
 void MainWindow::doRemez( void ) {
-    QVector<long double> T( nTaps ) ;
-    QVector<long double> bands ;
-    QVector<long double> response ;
-    QVector<long double> weight ;
-    double slope ;
+    QVector<ld_t> T( nTaps ) ;
+    QVector<ld_t> bands ;
+    QVector<ld_t> response ;
+    QVector<ld_t> weight ;
     int nbands = 0 ;
 
     double tw = ui->dsbTW->value() / 2.0 ;
@@ -274,7 +306,7 @@ void MainWindow::doRemez( void ) {
         nbands = 1 ;
         tfl = ui->dsbDiffLowerBandEdge->value() ;
         tfr = ui->dsbDiffUpperBandEdge->value() ;
-        slope = ui->dsbDiffDesiredSlope->value() ;
+//        slope = ui->dsbDiffDesiredSlope->value() ;
         bands << tfl << tfr ;
         response << 0 << 1 << 0 ;
         weight << 1 << 1 ;
@@ -312,21 +344,39 @@ void MainWindow::doRemez( void ) {
 }
 
 void MainWindow::doRRC( void ) {
-    QVector<long double> T( nTaps ) ;
+    QVector<ld_t> T( nTaps ) ;
     rootRaisedCosine( T.data(), ui->dsbRRCSPS->value(), ui->dsbRRCBeta->value(), nTaps ) ;
     Coefs = T ;
 }
 
 void MainWindow::doGauss( void ) {
-    QVector<long double> T( nTaps ) ;
+    QVector<ld_t> T( nTaps ) ;
     gaussian( T.data(), ui->dsbGSPS->value(), ui->dsbGBT->value(), nTaps ) ;
     Coefs = T ;
+}
+
+#include <complex>
+int newton_real( register int n, const double coeff[], std::complex<double> res[] ) ;
+void MainWindow::findRoots( int nTaps ) {
+    std::complex<double> zeroes[ 1024 ] ;
+    double t[ nTaps ] ;
+    for ( int i = 0 ; i < nTaps ; i += 1 )
+        t[ i ] = Coefs[ i ] ;
+    newton_real( nTaps, t, zeroes ) ;
+    ZeroesReal.resize( nTaps ) ;
+    ZeroesImag.resize( nTaps ) ;
+    for ( int i = 0 ; i < nTaps ; i += 1 ) {
+        ZeroesReal[ i ] = zeroes[ i ].real() ;
+        ZeroesImag[ i ] = zeroes[ i ].imag() ;
+    }
+//    qDebug() << zeroes[ 0 ].real() << zeroes[ 1 ].real() ;
 }
 
 void MainWindow::doShow( void ) {
     customPlotTime->graph(0)->clearData();
     customPlotTime->graph(1)->clearData();
     customPlotFreq->graph(0)->clearData();
+    customPlotZero->graph(0)->clearData();
 
     QVector<double> x( nTaps ) ;
     for ( int i = 0 ; i < nTaps ; i += 1 )
@@ -350,25 +400,27 @@ void MainWindow::doShow( void ) {
     if ( Coefs.isEmpty() )
         return ;
 
+    findRoots( nTaps ) ;
+    customPlotZero->graph(0)->setData( ZeroesReal, ZeroesImag ) ;
+    customPlotZero->replot() ;
+
     int FFTLEN = nTaps < 2048 ? 2048 : nTaps ;
 
     QVector<double> x2( FFTLEN ) ;
     for ( int i = 0 ; i < FFTLEN / 2 ; i += 1 )
         x2[ i ] = (double)i / FFTLEN ;
 
-    QVector<long double> F( 2 * FFTLEN ) ;
+    QVector<ld_t> F( 2 * FFTLEN ) ;
     freqChar( Coefs.data(), F.data(), nTaps, FFTLEN ) ;
 
     QVector<double> M( FFTLEN ) ;
     magnitude( F.data(), M.data(), FFTLEN, ui->cbLog->isChecked() ) ;
-    QVector<double> P( FFTLEN ) ;
-    phase( F.data(), P.data(), FFTLEN ) ;
-    QVector<double> D( FFTLEN ) ;
-    group( P.data(), D.data(), FFTLEN ) ;
+//    QVector<double> P( FFTLEN ) ;
+//    phase( F.data(), P.data(), FFTLEN ) ;
+//    QVector<double> D( FFTLEN ) ;
+//    group( P.data(), D.data(), FFTLEN ) ;
 
     customPlotFreq->graph(0)->setData( x2, M ) ;
-//    customPlotFreq->graph(1)->setData( x2, P ) ;
-//    customPlotFreq->graph(2)->setData( x2, D ) ;
 
     customPlotFreq->graph(0)->rescaleKeyAxis();
 
@@ -377,10 +429,7 @@ void MainWindow::doShow( void ) {
     else
         customPlotFreq->yAxis->setRange( QCPRange( -0.2, 1.2 ) ) ;
 
-
-//    customPlotFreq->graph(0)->rescaleValueAxis();
-//    customPlotFreq->graph(1)->rescaleValueAxis();
-    customPlotFreq->replot();
+    customPlotFreq->replot() ;
 
     double range = pow( 2, ui->dsbNBits->value() ) - 1 ;
     ui->twCoefs->clear();

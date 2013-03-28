@@ -1061,6 +1061,16 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>Zeros</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <layout class="QHBoxLayout" name="loZero"/>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </widget>
       <widget class="QGroupBox" name="gbParams">

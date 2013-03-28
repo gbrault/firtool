@@ -7,8 +7,6 @@ typedef enum _RemezType {
     HILBERT = 3
 } REMEZ_t ;
 
-typedef long double ld_t ;
-
 int remez( ld_t h[], int numtaps, int numband, const ld_t bands[],
       const ld_t des[], const ld_t weight[], REMEZ_t type, int griddensity ) ;
 

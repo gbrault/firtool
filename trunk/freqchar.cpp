@@ -1,9 +1,10 @@
 
 #include "math.h"
+#include "double.h"
 #include "fftw.h"
 
 
-void freqChar( long double * T, long double * F, int n, int m ) {
+void freqChar( ld_t * T, ld_t * F, int n, int m ) {
     fftwl_complex R[ m ] ;
 
     for ( int i = 0 ; i < m ; i += 1 )
@@ -18,13 +19,13 @@ void freqChar( long double * T, long double * F, int n, int m ) {
     fftf( R, (fftwl_complex *)F, m ) ;
 }
 
-void freqChar2( long double * T, long double * F, int n, int m ) {
-    long double t = (long double)M_PI * 2.0L / m ;
+void freqChar2( ld_t * T, ld_t * F, int n, int m ) {
+    ld_t t = (ld_t)M_PI * 2.0L / m ;
 
     for ( int i = 0 ; i < m ; i += 1 ) {
-        long double theta = t * i ;
-        long double sac = 0.0L ;
-        long double sas = 0.0L ;
+        ld_t theta = t * i ;
+        ld_t sac = 0.0L ;
+        ld_t sas = 0.0L ;
         for ( int k = 0 ; k < n ; k += 1 ) {
             sac = sac + cos( theta * k ) * T[ k ] ;
             sas = sas + sin( theta * k ) * T[ k ] ;
@@ -35,8 +36,8 @@ void freqChar2( long double * T, long double * F, int n, int m ) {
 }
 
 
-void magnitude( long double * F, double * M, int n, bool log ) {
-    long double max = 0.0L ;
+void magnitude( ld_t * F, double * M, int n, bool log ) {
+    ld_t max = 0.0L ;
 
     for ( int i = 0 ; i < n ; i += 1 ) {
         M[ i ] = F[ 2 * i + 0 ] * F[ 2 * i + 0 ] + F[ 2 * i + 1 ] * F[ 2 * i + 1 ] ;
@@ -51,7 +52,7 @@ void magnitude( long double * F, double * M, int n, bool log ) {
             M[ i ] = M[ i ] / max ;
 }
 
-void phase( long double * F, double * P, int n ) {
+void phase( ld_t * F, double * P, int n ) {
     for ( int i = 0 ; i < n ; i += 1 )
         P[ i ] = atan2l( F[ 2 * i + 1 ], F[ 2 * i + 0 ] ) ;
 }
