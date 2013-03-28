@@ -24,8 +24,7 @@ SOURCES += \
     windowHarris.cpp \
     windowRifeVincent.cpp \
     remez.cpp \
-    Newton_Real.cpp
-#    zolotarevFIR.cpp
+    newton_real.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -40,7 +39,6 @@ HEADERS  += \
     windowKaiser.h \
     remez.h \
     double.h
-#    zolotarevFIR.hpp
 
 FORMS    += mainwindow.ui
 
