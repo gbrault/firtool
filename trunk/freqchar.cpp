@@ -3,7 +3,6 @@
 #include "double.h"
 #include "fftw.h"
 
-
 void freqChar( ld_t * T, ld_t * F, int n, int m ) {
     fftwl_complex R[ m ] ;
 
