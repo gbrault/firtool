@@ -9,5 +9,4 @@ typedef enum _RV {
 void rifeVincentII( ld_t * W, int aLen , double aAtten, int M ) ;
 void rifeVincent( RV_t type, ld_t * W, int aLen ) ;
 
-
 #endif // WINDOWRIFEVINCENT_H
