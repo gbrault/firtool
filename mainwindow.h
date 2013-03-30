@@ -45,6 +45,8 @@ private slots:
 
     void on_twMethod_currentChanged(int index);
 
+    void on_cbLog_stateChanged(int arg1);
+
 private:
     void doCheby();
     void doKaiser();
