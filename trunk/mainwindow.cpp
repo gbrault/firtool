@@ -568,3 +568,8 @@ void MainWindow::on_pbEstimate_clicked() {
     ui->dsbNTaps->setValue( nTaps | 1 ) ;
 }
 
+
+void MainWindow::on_cbLog_stateChanged(int arg1) {
+    (void)arg1 ;
+    doShow() ;
+}
