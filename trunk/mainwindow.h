@@ -34,6 +34,10 @@ public:
     
     void closeEvent(QCloseEvent *event);
     void findRoots(int nTaps);
+
+protected:
+   void resizeEvent(QResizeEvent *);  // virtual
+
 private slots:
     void on_actionDesign_triggered();
     void on_actionSave_Coefs_triggered();

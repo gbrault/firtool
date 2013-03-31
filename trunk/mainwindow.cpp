@@ -25,6 +25,12 @@ MainWindow::MainWindow( QWidget *parent ) :
     customPlotFreq->addGraph( customPlotFreq->xAxis, customPlotFreq->yAxis2 ) ;
     customPlotFreq->graph( 2 )->setPen( QPen( Qt::green ) ) ;
 
+    customPlotFreq->xAxis->setRange( QCPRange( 0.0, 0.4999 ) ) ;
+    customPlotFreq->yAxis->setRange( QCPRange( -200, 10 ) ) ;
+    customPlotFreq->xAxis->setAutoTickStep( false ) ;
+    customPlotFreq->xAxis->setAutoTickCount( 10 ) ;
+        customPlotFreq->xAxis->setTickStep( 0.1 ) ;
+
     // make range moveable by mouse interaction (click and drag):
     customPlotFreq->setRangeDrag( Qt::Horizontal | Qt::Vertical ) ;
     customPlotFreq->setRangeZoom( Qt::Horizontal | Qt::Vertical ) ;
@@ -32,6 +38,8 @@ MainWindow::MainWindow( QWidget *parent ) :
 
     customPlotFreq->setAntialiasedElements( QCP::aeNone ) ;
     customPlotFreq->setNotAntialiasedElements( QCP::aeAll ) ;
+    customPlotFreq->xAxis->setSubGrid( true ) ;
+    customPlotFreq->yAxis->setSubGrid( true ) ;
 
     customPlotTime = new QCustomPlot() ;
     ui->loTime->addWidget( customPlotTime ) ;
@@ -59,9 +67,12 @@ MainWindow::MainWindow( QWidget *parent ) :
     customPlotTime->setRangeDrag( Qt::Horizontal | Qt::Vertical ) ;
     customPlotTime->setRangeZoom( Qt::Horizontal | Qt::Vertical ) ;
     customPlotTime->setInteraction(QCustomPlot::iSelectPlottables); // allow selection of graphs via mouse click
+    customPlotTime->xAxis->setSubGrid( true ) ;
+    customPlotTime->yAxis->setSubGrid( true ) ;
 
     customPlotZero = new QCustomPlot() ;
-    ui->loZero->addWidget( customPlotZero ) ;
+    ui->loZero->insertWidget( 0, customPlotZero ) ;
+    customPlotZero->setMinimumWidth( customPlotZero->size().width() ) ;
     customPlotZero->setupFullAxesBox() ;
     customPlotZero->xAxis->setRange( QCPRange( -1.3, 1.3 ) ) ;
     customPlotZero->yAxis->setRange( QCPRange( -1.3, 1.3 ) ) ;
@@ -369,6 +380,10 @@ void MainWindow::findRoots( int nTaps ) {
         ZeroesReal[ i ] = zeroes[ i ].real() ;
         ZeroesImag[ i ] = zeroes[ i ].imag() ;
     }
+}
+
+void MainWindow::resizeEvent(QResizeEvent *) {
+    customPlotZero->setFixedWidth( customPlotZero->size().height() ) ;
 }
 
 void MainWindow::doShow( void ) {
