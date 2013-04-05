@@ -387,10 +387,10 @@ void MainWindow::resizeEvent(QResizeEvent *) {
 }
 
 void MainWindow::doShow( void ) {
-    customPlotTime->graph(0)->clearData();
-    customPlotTime->graph(1)->clearData();
-    customPlotFreq->graph(0)->clearData();
-    customPlotZero->graph(0)->clearData();
+    customPlotTime->graph(0)->clearData() ;
+    customPlotTime->graph(1)->clearData() ;
+    customPlotFreq->graph(0)->clearData() ;
+    customPlotZero->graph(0)->clearData() ;
 
     QVector<double> x( nTaps ) ;
     for ( int i = 0 ; i < nTaps ; i += 1 )
