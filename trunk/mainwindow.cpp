@@ -8,7 +8,7 @@ MainWindow::MainWindow( QWidget *parent ) :
 {
     ui->setupUi( this ) ;
 
-    this->setWindowTitle( "FIRTool V0.1 ( Qt " + QString(QT_VERSION_STR) + ") - http://www.mediatronix.com" ) ;
+    this->setWindowTitle( "FIRTool V0.1 (Qt " + QString(QT_VERSION_STR) + ") - http://www.mediatronix.com" ) ;
     this->setWindowIcon( QIcon( ":/files/toolbox.ico" ) ) ;
 
     // standard
