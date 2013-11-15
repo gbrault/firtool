@@ -49,7 +49,7 @@
 //static char _V_[] = "@(#)newton Real.cpp 01.01 -- Copyright (C) Future Team Aps";
 
 #include <stdio.h>
-#include <malloc.h>
+//#include <malloc.h>
 #include <time.h>
 #include <math.h>
 #include <float.h>
@@ -165,7 +165,7 @@ static double upperbound( const int n, const double a[], const complex<double> z
    t = a[ n ] + z.real() * r - q * s;
    e = u * e + fabs( t );
    e = ( 9.0 * e - 7.0 * ( fabs( t ) + fabs( r ) * u ) +
-       fabs( z.real() ) * fabs( r ) * 2.0 ) * pow( FLT_RADIX, -DBL_MANT_DIG+1);
+       fabs( z.real() ) * fabs( r ) * 2.0 ) * pow( (double)FLT_RADIX, -DBL_MANT_DIG+1);
 
    return e * e;
    }
@@ -243,7 +243,7 @@ int newton_real( register int n, const double coeff[], complex<double> res[] ) {
       f = feval( n, a, z, &fz );
       r0 = 2.5 * u;
       r = sqrt( dz.real() * dz.real() + dz.imag() * dz.imag() );
-      eps = 4 * n * n * f0 * pow( FLT_RADIX, -DBL_MANT_DIG * 2 );
+      eps = 4 * n * n * f0 * pow( (double)FLT_RADIX, -DBL_MANT_DIG * 2 );
 
       // Start iteration 
       for( stage1 = 1, itercnt = 0; ( z.real() + dz.real() != z.real() || z.imag() + dz.imag() != z.imag() )
@@ -308,7 +308,7 @@ iter2:
             eps = upperbound( n, a, z );
             }
 
-         if( r < sqrt( z.real() * z.real() + z.imag() * z.imag() ) * pow( FLT_RADIX, -DBL_MANT_DIG/2 ) && f >= f0 )
+         if( r < sqrt( z.real() * z.real() + z.imag() * z.imag() ) * pow( (double)FLT_RADIX, -DBL_MANT_DIG/2 ) && f >= f0 )
             {
             /* Domain rounding errors */
             z = z0;

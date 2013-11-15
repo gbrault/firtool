@@ -10,5 +10,6 @@
         <file>exit.png</file>
         <file>about.png</file>
         <file>icon-qt-in-a-box.png</file>
+        <file>cpu_inspect.png</file>
     </qresource>
 </RCC>

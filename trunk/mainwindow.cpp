@@ -127,6 +127,8 @@ MainWindow::MainWindow( QWidget *parent ) :
     ui->cbFilterType->setCurrentIndex( 0 ) ;
     ui->dsbSubtype->setValue( 0 ) ;
 
+    loadSavePath = QDir::currentPath() ;
+
     // settings
 //    readSettings() ;
 }
@@ -368,10 +370,12 @@ void MainWindow::doGauss( void ) {
 int newton_real( register int n, const double coeff[], std::complex<double> res[] ) ;
 void MainWindow::findRoots( int nTaps ) {
     double t[ nTaps ] ;
-    for ( int i = 0 ; i < nTaps ; i += 1 )
+    for ( int i = 0 ; i < nTaps ; i += 1 ) {
         t[ i ] = Coefs[ i ] ;
+        t[ i ] = Coefs[ i ] ;
+    }
 
-    std::complex<double> zeroes[ nTaps ] ;
+    std::complex<double> zeroes[ 1024 ] ;
     newton_real( nTaps, t, zeroes ) ;
 
     ZeroesReal.resize( nTaps ) ;
@@ -464,15 +468,100 @@ void MainWindow::doShow( void ) {
     }
 }
 
+void MainWindow::on_actionLoad_Coefs_triggered() {
+    QString fileName = QFileDialog::getOpenFileName(
+        this, tr("Load Coefficient File"), loadSavePath, tr(
+            "Xilinx coefficient files (*.coe);;All files (*.*)" ) ) ;
+    if ( fileName.isEmpty() )
+        return ;
+
+    loadSavePath = QDir::cleanPath( fileName ) ;
+
+    Coefs.clear();
+    Window.clear();
+    QFile file( fileName ) ;
+    if ( ! file.open( QIODevice::ReadOnly | QIODevice::Text ) )
+        return ;
+
+    QTextStream stream( &file ) ;
+    if ( fileName.endsWith( ".coe", Qt::CaseInsensitive ) ) {
+        QString all ;
+        all = stream.readAll() ;
+        QString::iterator s ;
+        int state = 0 ;
+        double radix = 0.0 ;
+        for ( QString::iterator p = all.begin() ; p != all.end() ; ) {
+            if ( p->isLetter() ) {
+                s = p ;
+                while ( p != all.end() && p->isLetter() )
+                    p += 1 ;
+                QString word( s, p - s ) ;
+                if ( state == 0 && word == "radix" )
+                    state = -1 ;
+                else if ( state < 1 && word == "coefdata" )
+                    state = 1 ;
+                else {
+                    statusBar()->showMessage( "Load coefs: syntax error", 2000 ) ;
+                    break ;
+                }
+            } else if ( p->isNumber() || *p == '+' || *p == '-' || *p == '.' ) {
+                s = p ;
+                while ( p != all.end() && ( p->isNumber() || *p == '+' || *p == '-' || *p == '.' || *p == 'e' || *p == 'E' ) )
+                    p += 1 ;
+                QString number( s, p - s ) ;
+                if ( state == -1 )
+                    radix = number.toDouble() ;
+                else if ( state == 1 )
+                    Coefs.push_back( number.toDouble() ) ;
+            } else if ( *p == ';' ) {
+                if ( state == 1 )
+                    break ;
+                else
+                    while ( p != all.end() && p->isPrint() )
+                        p += 1 ;
+            } else if ( *p == ',' ) {
+                if ( state == 1 )
+                    p += 1 ;
+                else {
+                    statusBar()->showMessage( "Load coefs: syntax error", 2000 ) ;
+                    break ;
+                }
+            } else
+                p += 1 ;
+        }
+        file.close() ;
+
+        // tap count
+        nTaps = Coefs.size() ;
+        if ( nTaps <= 0 ) {
+            statusBar()->showMessage( "Load coefs: load error", 2000 ) ;
+            return ;
+        }
+        ui->dsbNTaps->setValue( nTaps ) ;
+
+        // scale
+        ld_t scale = 2.0L * fabsl( Coefs[ nTaps / 2 ] ) ;
+        if ( fabsl( scale ) > 1E-20 )
+            for( int i = 0 ; i < nTaps ; i++ )
+                Coefs[ i ] /= scale ;
+
+        doShow() ;
+    } else
+        statusBar()->showMessage( "Load coefs: <not implemented yet>", 2000 ) ;
+
+}
+
 void MainWindow::on_actionSave_Coefs_triggered() {
     if ( Coefs.isEmpty() )
         return ;
 
     QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Save Coefficient File"), ".", tr(
+        this, tr("Save Coefficient File"), loadSavePath, tr(
             "Xilinx coefficient files (*.coe);;C/C++ include files (*.h);;VHDL files (*.vhd);;All files (*.*)" ) ) ;
     if ( fileName.isEmpty() )
         return ;
+
+    loadSavePath = QDir::cleanPath( fileName ) ;
 
     QFile file( fileName ) ;
     if ( ! file.open( QIODevice::WriteOnly | QIODevice::Text ) )
@@ -588,3 +677,4 @@ void MainWindow::on_cbLog_stateChanged(int arg1) {
     (void)arg1 ;
     doShow() ;
 }
+
