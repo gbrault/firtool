@@ -1029,7 +1029,7 @@
          <enum>QTabWidget::Triangular</enum>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tabMagnitude">
          <attribute name="title">
@@ -1264,6 +1264,7 @@
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
     <addaction name="separator"/>
+    <addaction name="actionLoad_Coefs"/>
     <addaction name="actionSave_Coefs"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
@@ -1290,8 +1291,10 @@
    <addaction name="actionSave"/>
    <addaction name="actionSave_As"/>
    <addaction name="separator"/>
-   <addaction name="actionDesign"/>
+   <addaction name="actionLoad_Coefs"/>
    <addaction name="actionSave_Coefs"/>
+   <addaction name="separator"/>
+   <addaction name="actionDesign"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNew">
@@ -1373,6 +1376,15 @@
    </property>
    <property name="text">
     <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionLoad_Coefs">
+   <property name="icon">
+    <iconset resource="firtool.qrc">
+     <normaloff>:/new/icons/cpu_inspect.png</normaloff>:/new/icons/cpu_inspect.png</iconset>
+   </property>
+   <property name="text">
+    <string>Load Coefs</string>
    </property>
   </action>
  </widget>

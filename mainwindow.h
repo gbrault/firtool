@@ -51,6 +51,8 @@ private slots:
 
     void on_cbLog_stateChanged(int arg1);
 
+    void on_actionLoad_Coefs_triggered();
+
 private:
     void doCheby();
     void doKaiser();
@@ -68,6 +70,7 @@ private:
     QCustomPlot * customPlotZero ;
 
     int nTaps ;
+    QString loadSavePath ;
 
     QVector<ld_t> Coefs ;
     QVector<ld_t> Window ;
