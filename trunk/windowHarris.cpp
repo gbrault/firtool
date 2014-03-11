@@ -2,7 +2,7 @@
 #include <math.h>
 #include "double.h"
 
-void harris( ld_t * W, int aLen ) {
+void harris4( ld_t * W, int aLen ) {
     for ( int k = 0 ; k < aLen ; k += 1 )
         W[ k ] =
             +0.35875L +
@@ -10,6 +10,17 @@ void harris( ld_t * W, int aLen ) {
             +0.14128L * cosl( 4.0L * M_PI * k / ( aLen - 1 ) ) +
             -0.01168L * cosl( 6.0L * M_PI * k / ( aLen - 1 ) ) +
             +0.00000L * cosl( 8.0L * M_PI * k / ( aLen - 1 ) ) ;
+}
+
+void harris7( ld_t * W, int aLen ) {
+    for ( int k = 0 ; k < aLen ; k += 1 )
+        W[ k ] = 0.2712203606 +
+            -0.4334446123  * cosl(  2.0L * M_PI * k / ( aLen - 1 ) ) +
+            +0.21800412    * cosl(  4.0L * M_PI * k / ( aLen - 1 ) ) +
+            -0.0657853433  * cosl(  6.0L * M_PI * k / ( aLen - 1 ) ) +
+            +0.0107618673  * cosl(  8.0L * M_PI * k / ( aLen - 1 ) ) +
+            -0.0007700127  * cosl( 10.0L * M_PI * k / ( aLen - 1 ) ) +
+            +0.00001368088 * cosl( 12.0L * M_PI * k / ( aLen - 1 ) ) ;
 }
 
 void nuttall( ld_t * W, int aLen ) {

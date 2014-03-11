@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "qxmlsettings.h"
 
 MainWindow::MainWindow( QWidget *parent ) :
     QMainWindow(parent),
@@ -103,7 +104,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     ui->cbFilterType->addItems(
         QStringList()
             << " Taylor" << " Rife-Vincent"
-            << " harris" << " Nuttall" << " Flat top" << "Connes"
+            << " harris4" << " harris7" << " Nuttall" << " Flat top" << "Connes"
     ) ;
 
     ui->twCoefs->setHeaderLabels( QStringList() << "Index" << "Coefs" << "Actual" << "Window" ) ;
@@ -131,9 +132,13 @@ MainWindow::MainWindow( QWidget *parent ) :
 
     // settings
 //    readSettings() ;
+
 }
 
 MainWindow::~MainWindow() {
+    // settings
+//    writeSettings() ;
+
     delete ui;
 }
 
@@ -238,15 +243,18 @@ void MainWindow::doWindowed( void ) {
         rifeVincent( (RV_t)ui->dsbSubtype->value(), Window.data(), nTaps ) ;
         break ;
     case 2 :
-        harris( Window.data(), nTaps ) ;
+        harris4( Window.data(), nTaps ) ;
         break ;
     case 3 :
-        nuttall( Window.data(), nTaps ) ;
+        harris7( Window.data(), nTaps ) ;
         break ;
     case 4 :
-        flattop( Window.data(), nTaps ) ;
+        nuttall( Window.data(), nTaps ) ;
         break ;
     case 5 :
+        flattop( Window.data(), nTaps ) ;
+        break ;
+    case 6 :
         connes( Window.data(), nTaps ) ;
         break ;
     }
@@ -375,7 +383,7 @@ void MainWindow::findRoots( int nTaps ) {
         t[ i ] = Coefs[ i ] ;
     }
 
-    std::complex<double> zeroes[ 1024 ] ;
+    std::complex<double> zeroes[ nTaps ] ;
     newton_real( nTaps, t, zeroes ) ;
 
     ZeroesReal.resize( nTaps ) ;
@@ -678,3 +686,72 @@ void MainWindow::on_cbLog_stateChanged(int arg1) {
     doShow() ;
 }
 
+
+void MainWindow::on_actionNew_triggered() {
+    projectFileName = "" ;
+}
+
+void MainWindow::on_actionOpen_triggered() {
+    const QSettings::Format XmlFormat = QSettings::registerFormat( "mtx", readXmlFile, writeXmlFile ) ;
+
+    projectFileName = QFileDialog::getOpenFileName(
+        0, "Open Project File", loadSavePath, "FIRTool project files (*.mtx);;All files (*.*)" ) ;
+    if ( projectFileName.isEmpty() )
+        return ;
+
+    QSettings settings( projectFileName, XmlFormat ) ;
+
+    settings.beginGroup( "type" ) ;
+        ui->twType->setCurrentIndex( settings.value( "index", 0 ).toInt() ) ;
+        ui->dsbLPStop->setValue( settings.value( "dsbLPStop", 0.25 ).toDouble() ) ;
+        ui->dsbHPStart->setValue( settings.value( "dsbHPStart", 0.25 ).toDouble() ) ;
+        ui->dsbBPStart->setValue( settings.value( "dsbBPStart", 0.15 ).toDouble() ) ;
+        ui->dsbBPStop->setValue( settings.value( "dsbBPStop", 0.35 ).toDouble() ) ;
+        ui->dsbBSStart->setValue( settings.value( "dsbBSStart", 0.15 ).toDouble() ) ;
+        ui->dsbBSStop->setValue( settings.value( "dsbBSStop", 0.35 ).toDouble() ) ;
+    settings.endGroup() ;
+
+    settings.beginGroup( "method" ) ;
+        ui->twMethod->setCurrentIndex( settings.value( "index", 0 ).toInt() ) ;
+        ui->dsbChebyBeta->setValue( settings.value( "dsbChebyBeta", 1.001 ).toDouble() ) ;
+        ui->dsbKaiserBeta->setValue( settings.value( "dsbKaiserBeta", 4.0 ).toDouble() ) ;
+        ui->cbFilterType->setCurrentIndex( settings.value( "cbFilterType", 0 ).toInt() ) ;
+    settings.endGroup() ;
+}
+
+void MainWindow::on_actionSave_triggered() {
+    const QSettings::Format XmlFormat = QSettings::registerFormat( "mtx", readXmlFile, writeXmlFile ) ;
+
+    if ( projectFileName.isEmpty() ) {
+        projectFileName = QFileDialog::getSaveFileName(
+            0, "Save Project File", loadSavePath, "FIRTool project files (*.mtx);;All files (*.*)" ) ;
+        if ( projectFileName.isEmpty() )
+            return ;
+    }
+
+    QSettings settings( projectFileName, XmlFormat ) ;
+
+    settings.clear() ;
+
+    settings.beginGroup( "type" ) ;
+        settings.setValue( "index", ui->twType->currentIndex() ) ;
+        settings.setValue( "dsbLPStop", ui->dsbLPStop->value() ) ;
+        settings.setValue( "dsbHPStart", ui->dsbHPStart->value() ) ;
+        settings.setValue( "dsbBPStart", ui->dsbBPStart->value() ) ;
+        settings.setValue( "dsbBPStop", ui->dsbBPStop->value() ) ;
+        settings.setValue( "dsbBSStart", ui->dsbBSStart->value() ) ;
+        settings.setValue( "dsbBSStop", ui->dsbBSStop->value() ) ;
+    settings.endGroup() ;
+
+    settings.beginGroup( "method" ) ;
+        settings.setValue( "index", ui->twMethod->currentIndex() ) ;
+        settings.setValue( "dsbChebyBeta", ui->dsbChebyBeta->value() ) ;
+        settings.setValue( "dsbKaiserBeta", ui->dsbKaiserBeta->value() ) ;
+        settings.setValue( "cbFilterType", ui->cbFilterType->currentIndex() ) ;
+    settings.endGroup() ;
+}
+
+void MainWindow::on_actionSave_As_triggered() {
+    projectFileName = "" ;
+    on_actionSave_triggered() ;
+}
