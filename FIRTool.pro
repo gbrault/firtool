@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets printsupport
+QT += core gui xml widgets printsupport
 
 TARGET = FIRTool
 TEMPLATE = app
@@ -21,7 +21,8 @@ SOURCES += \
     windowHarris.cpp \
     windowRifeVincent.cpp \
     remez.cpp \
-    newton_real.cpp
+    newton_real.cpp \
+    qxmlsettings.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -35,7 +36,8 @@ HEADERS  += \
     windowCheby.h \
     windowKaiser.h \
     remez.h \
-    double.h
+    double.h \
+    qxmlsettings.h
 
 FORMS    += mainwindow.ui
 
