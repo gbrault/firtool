@@ -1125,6 +1125,9 @@
           <property name="suffix">
            <string> Hz</string>
           </property>
+          <property name="decimals">
+           <number>6</number>
+          </property>
           <property name="maximum">
            <double>1.000000000000000</double>
           </property>
@@ -1290,6 +1293,8 @@
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
    <addaction name="actionSave_As"/>
+   <addaction name="separator"/>
+   <addaction name="actionExit"/>
    <addaction name="separator"/>
    <addaction name="actionLoad_Coefs"/>
    <addaction name="actionSave_Coefs"/>

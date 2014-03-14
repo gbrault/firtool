@@ -9,6 +9,7 @@ QT += core gui xml widgets printsupport
 TARGET = FIRTool
 TEMPLATE = app
 
+
 SOURCES += \
     main.cpp \
     mainwindow.cpp \

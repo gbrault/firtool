@@ -81,6 +81,9 @@ private:
     QVector<ld_t> Window ;
     QVector<double> ZeroesReal ;
     QVector<double> ZeroesImag ;
+
+    void readSettings();
+    void writeSettings();
 } ;
 
 #endif // MAINWINDOW_H

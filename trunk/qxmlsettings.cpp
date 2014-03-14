@@ -280,9 +280,11 @@ bool readXmlFile(QIODevice &aDevice, QSettings::SettingsMap &aMap) {
     }
 
     QDomElement vRoot = vDocument.documentElement();
-    if(vRoot.tagName() != QApplication::applicationName().split( " " ).first() ) return false;
+//    qDebug() << vRoot.tagName() ;
+    if ( vRoot.tagName() != QApplication::applicationName().split( " " ).first() )
+        return false ;
 
-    return readXmlFileElement(QString::null,vRoot,aMap);
+    return readXmlFileElement( QString::null, vRoot, aMap ) ;
 }
 
 //! function
@@ -301,7 +303,7 @@ bool writeXmlFile(QIODevice &aDevice, const QSettings::SettingsMap &aMap) {
     QDomComment vComment = vDocument.createComment( QDateTime::currentDateTime().toString( Qt::ISODate ) ) ;
     vDocument.appendChild(vComment);
 
-    QDomElement vRoot = vDocument.createElement(QApplication::applicationName().split( " " ).first());
+    QDomElement vRoot = vDocument.createElement( QApplication::applicationName().split( " " ).first() );
     vDocument.appendChild(vRoot);
 
     QMap<QString,QVariant>::const_iterator vIter = aMap.begin();
