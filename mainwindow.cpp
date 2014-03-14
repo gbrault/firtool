@@ -131,15 +131,38 @@ MainWindow::MainWindow( QWidget *parent ) :
     loadSavePath = QDir::currentPath() ;
 
     // settings
-//    readSettings() ;
-
+    readSettings() ;
 }
 
 MainWindow::~MainWindow() {
     // settings
-//    writeSettings() ;
-
+    writeSettings() ;
     delete ui;
+}
+
+void MainWindow::readSettings( void ) {
+    const QSettings::Format XmlFormat = QSettings::registerFormat( "mtx", readXmlFile, writeXmlFile ) ;
+
+    QSettings settings( "./FIRtool.xml", XmlFormat ) ;
+
+    settings.beginGroup( "mainwindow" ) ;
+        resize(settings.value( "size", size() ).toSize() ) ;
+        move(settings.value( "pos", pos() ).toPoint() ) ;
+    settings.endGroup() ;
+}
+
+void MainWindow::writeSettings( void ) {
+    const QSettings::Format XmlFormat = QSettings::registerFormat( "mtx", readXmlFile, writeXmlFile ) ;
+
+    QSettings settings( "./FIRtool.xml", XmlFormat ) ;
+
+    settings.clear() ;
+    settings.sync() ;
+
+    settings.beginGroup( "mainwindow" ) ;
+        settings.setValue( "size", size() ) ;
+        settings.setValue( "pos", pos() ) ;
+    settings.endGroup() ;
 }
 
 void MainWindow::on_actionAbout_triggered() {
@@ -606,7 +629,7 @@ void MainWindow::on_actionSave_Coefs_triggered() {
                       .arg( -(int)(range / 2) )
                       .arg( (int)(range / 2) ) ;
         for ( int i = 0 ; i < Coefs.size() - 1 ; i += 1 )
-          stream << QString("        %1").arg( trunc( Coefs[ i ] * range ), 0, 'g', 9 ) << ",\n" ;
+            stream << QString("        %1").arg( trunc( Coefs[ i ] * range ), 0, 'g', 9 ) << ",\n" ;
         stream << QString("        %1").arg( trunc( Coefs[ Coefs.size() - 1 ] * range ), 0, 'g', 9 ) << "\n    ) ;" ;
     }
     file.close() ;
@@ -651,28 +674,28 @@ void MainWindow::on_pbEstimate_clicked() {
     // various estimators
     switch ( ui->twMethod->currentIndex() ) {
     case 0 : {
-            nTaps = ceil( 1 + acosh( 1 / pow( 10.0, dp ) ) / tw / 2 ) ;
-            double beta = cosh( acosh( pow( 10.0, attn / 20.0 ) ) / (nTaps - 1) ) ;
-            ui->dsbChebyBeta->setValue( beta ) ;
-        }
+        nTaps = ceil( 1 + acosh( 1 / pow( 10.0, dp ) ) / tw / 2 ) ;
+        double beta = cosh( acosh( pow( 10.0, attn / 20.0 ) ) / (nTaps - 1) ) ;
+        ui->dsbChebyBeta->setValue( beta ) ;
+    }
         break ;
     case 1 : {
-            double beta = 0.0 ;
-            if ( attn > 50.0 )
-                beta = 0.1102 *( attn - 8.7 ) ;
-            else if ( attn >= 21.0 )
-                beta = 0.5842 * pow( ( attn - 21.0 ), 0.4 ) + 0.07886 * ( attn - 21.0 ) ;
-            ui->dsbKaiserBeta->setValue( beta ) ;
-            nTaps = ceil( ( attn - 8.0 ) / ( 2.285 * tw ) ) ;
-        }
+        double beta = 0.0 ;
+        if ( attn > 50.0 )
+            beta = 0.1102 *( attn - 8.7 ) ;
+        else if ( attn >= 21.0 )
+            beta = 0.5842 * pow( ( attn - 21.0 ), 0.4 ) + 0.07886 * ( attn - 21.0 ) ;
+        ui->dsbKaiserBeta->setValue( beta ) ;
+        nTaps = ceil( ( attn - 8.0 ) / ( 2.285 * tw ) ) ;
+    }
         break ;
     default :
     case 2 : {
-            double Dinf = ds * ( 5.309e-3 * dp * dp + 7.114e-2 * dp + -4.761e-1 ) +
-                -2.66e-3 * dp * dp + -5.941e-1 * dp + -4.278e-1 ;
-            double f = 11.01217 + 0.51244 * ( dp - ds ) ;
-            nTaps = ceil( Dinf / tw - f * tw + 1 ) ;
-        }
+        double Dinf = ds * ( 5.309e-3 * dp * dp + 7.114e-2 * dp + -4.761e-1 ) +
+            -2.66e-3 * dp * dp + -5.941e-1 * dp + -4.278e-1 ;
+        double f = 11.01217 + 0.51244 * ( dp - ds ) ;
+        nTaps = ceil( Dinf / tw - f * tw + 1 ) ;
+    }
         break ;
 //    default :
 //        return ;
@@ -713,9 +736,25 @@ void MainWindow::on_actionOpen_triggered() {
 
     settings.beginGroup( "method" ) ;
         ui->twMethod->setCurrentIndex( settings.value( "index", 0 ).toInt() ) ;
+
         ui->dsbChebyBeta->setValue( settings.value( "dsbChebyBeta", 1.001 ).toDouble() ) ;
         ui->dsbKaiserBeta->setValue( settings.value( "dsbKaiserBeta", 4.0 ).toDouble() ) ;
+
         ui->cbFilterType->setCurrentIndex( settings.value( "cbFilterType", 0 ).toInt() ) ;
+        ui->dsbSubtype->setValue( settings.value( "dsbSubtype", 0 ).toDouble() ) ;
+
+        ui->dsbRRCSPS->setValue( settings.value( "dsbRRCSPS", 3.0 ).toDouble() ) ;
+        ui->dsbRRCBeta->setValue( settings.value( "dsbRRCBeta", 0.5 ).toDouble() ) ;
+
+        ui->dsbGSPS->setValue( settings.value( "dsbGSPS", 3.0 ).toDouble() ) ;
+        ui->dsbGBT->setValue( settings.value( "dsbGBT", 0.5 ).toDouble() ) ;
+
+        ui->cbLog->setChecked( settings.value( "cbLog", true ).toBool() ) ;
+
+        ui->dsbNTaps->setValue( settings.value( "dsbNTaps", 63 ).toDouble() ) ;
+        ui->dsbNBits->setValue( settings.value( "dsbNBits", 18 ).toDouble() ) ;
+        ui->dsbAtten->setValue( settings.value( "dsbAtten", 100 ).toDouble() ) ;
+        ui->dsbTW->setValue( settings.value( "dsbTW", 0.05 ).toDouble() ) ;
     settings.endGroup() ;
 }
 
@@ -732,6 +771,7 @@ void MainWindow::on_actionSave_triggered() {
     QSettings settings( projectFileName, XmlFormat ) ;
 
     settings.clear() ;
+    settings.sync() ;
 
     settings.beginGroup( "type" ) ;
         settings.setValue( "index", ui->twType->currentIndex() ) ;
@@ -745,9 +785,25 @@ void MainWindow::on_actionSave_triggered() {
 
     settings.beginGroup( "method" ) ;
         settings.setValue( "index", ui->twMethod->currentIndex() ) ;
+
         settings.setValue( "dsbChebyBeta", ui->dsbChebyBeta->value() ) ;
         settings.setValue( "dsbKaiserBeta", ui->dsbKaiserBeta->value() ) ;
+
         settings.setValue( "cbFilterType", ui->cbFilterType->currentIndex() ) ;
+        settings.setValue( "dsbSubtype", ui->dsbSubtype->value() ) ;
+
+        settings.setValue( "dsbRRCSPS", ui->dsbRRCSPS->value() ) ;
+        settings.setValue( "dsbRRCBeta", ui->dsbRRCBeta->value() ) ;
+
+        settings.setValue( "dsbGSPS", ui->dsbGSPS->value() ) ;
+        settings.setValue( "dsbGBT", ui->dsbGBT->value() ) ;
+
+        settings.setValue( "cbLog", ui->cbLog->isChecked() ) ;
+
+        settings.setValue( "dsbNTaps", ui->dsbNTaps->value() ) ;
+        settings.setValue( "dsbNBits", ui->dsbNBits->value() ) ;
+        settings.setValue( "dsbAtten", ui->dsbAtten->value() ) ;
+        settings.setValue( "dsbTW", ui->dsbTW->value() ) ;
     settings.endGroup() ;
 }
 

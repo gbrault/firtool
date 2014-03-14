@@ -555,10 +555,10 @@ int remez( ld_t h[], int numtaps, int numband, const ld_t bands[],
 /*
  * Dynamically allocate memory for arrays with proper sizes
  */
-   ld_t Grid[ gridsize ] ;
-   ld_t D[ gridsize ] ;
-   ld_t W[ gridsize ] ;
-   ld_t E[ gridsize ] ;
+   ld_t * Grid = new ld_t[ gridsize ] ;
+   ld_t * D = new ld_t[ gridsize ] ;
+   ld_t * W = new ld_t[ gridsize ] ;
+   ld_t * E = new ld_t[ gridsize ] ;
 
    int Ext[ r + 1 ] ;
    ld_t taps[ r + 1 ] ;
@@ -569,8 +569,7 @@ int remez( ld_t h[], int numtaps, int numband, const ld_t bands[],
 /*
  * Create dense frequency grid
  */
-   CreateDenseGrid( r, numtaps, numband, bands, des, weight,
-                   gridsize, Grid, D, W, symmetry, griddensity ) ;
+   CreateDenseGrid( r, numtaps, numband, bands, des, weight, gridsize, Grid, D, W, symmetry, griddensity ) ;
    InitialGuess( r, Ext, gridsize ) ;
 
 /*
@@ -618,12 +617,14 @@ int remez( ld_t h[], int numtaps, int numband, const ld_t bands[],
 /*
  * Perform the Remez Exchange algorithm
  */
+   int err = 0 ;
+
    for ( iter = 0 ; iter < MAXITERATIONS ; iter++ ) {
       CalcParms( r, Ext, Grid, D, W, ad, x, y ) ;
       CalcError( r, ad, x, y, gridsize, Grid, D, W, E ) ;
-      int err = Search( r, Ext, gridsize, E ) ;
-      if ( err )
-          return err ;
+      err = Search( r, Ext, gridsize, E ) ;
+      if ( err != 0 )
+          goto err_ret ;
 //      for( int i=0; i <= r; i++)
 //          assert(Ext[i]<gridsize);
       if ( isDone( r, Ext, E ) )
@@ -657,6 +658,14 @@ int remez( ld_t h[], int numtaps, int numband, const ld_t bands[],
  */
    FreqSample( numtaps, taps, h, symmetry ) ;
 
-   return iter < MAXITERATIONS ? 0 : -1 ;
+   err = iter < MAXITERATIONS ? 0 : -1 ;
+
+err_ret:
+   delete Grid ;
+   delete D ;
+   delete W ;
+   delete E ;
+
+   return err ;
 }
 
