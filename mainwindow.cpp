@@ -811,3 +811,19 @@ void MainWindow::on_actionSave_As_triggered() {
     projectFileName = "" ;
     on_actionSave_triggered() ;
 }
+
+void MainWindow::on_cbLPHB_stateChanged( int arg1 ) {
+    if ( arg1 == Qt::Checked ) {
+        ui->dsbLPStop->setValue( 0.25 ) ;
+        ui->dsbLPStop->setDisabled( true ) ;
+    } else
+        ui->dsbLPStop->setEnabled( true ) ;
+}
+
+void MainWindow::on_cbHPHB_stateChanged( int arg1 ) {
+    if ( arg1 == Qt::Checked ) {
+        ui->dsbHPStart->setValue( 0.25 ) ;
+        ui->dsbHPStart->setDisabled( true ) ;
+    } else
+        ui->dsbHPStart->setEnabled( true ) ;
+}
