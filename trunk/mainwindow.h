@@ -57,6 +57,10 @@ private slots:
     void on_actionSave_triggered() ;
     void on_actionSave_As_triggered() ;
 
+    void on_cbLPHB_stateChanged(int arg1);
+
+    void on_cbHPHB_stateChanged(int arg1);
+
 private:
     void doCheby() ;
     void doKaiser() ;
