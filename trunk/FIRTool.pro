@@ -4,7 +4,12 @@
 #
 #-------------------------------------------------
 
+<<<<<<< .mine
+
+QT       += core gui widgets printsupport
+=======
 QT += core gui xml widgets printsupport
+>>>>>>> .r43
 
 TARGET = FIRTool
 TEMPLATE = app
